@@ -33,5 +33,15 @@ namespace MindTrack.Services.Repositories
             await _mindTrackContext.Articles.AddAsync(article);
             await _mindTrackContext.SaveChangesAsync();
         }
+
+        public async Task DeleteArticle(Guid id)
+        {
+            var article = await _mindTrackContext.Articles.FindAsync(id);
+
+            if (article != null) _mindTrackContext.Articles.Remove(article);
+
+            await _mindTrackContext.SaveChangesAsync();
+
+        }
     }
 }

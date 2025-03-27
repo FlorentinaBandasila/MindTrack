@@ -50,5 +50,14 @@ namespace MindTrack.Web.Controllers
 
             return Ok("Article created successfully");
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteArticle([FromRoute] Guid id)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            await _articleService.DeleteArticle(id);
+            return Ok("Article deleted successfully");
+        }
     }
 }

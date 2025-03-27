@@ -37,5 +37,10 @@ namespace MindTrack.Services
         {
             await _articleRepository.CreateArticle(article);
         }
+
+        public async Task DeleteArticle(Guid id)
+        {
+            await _articleRepository.DeleteArticle(id);
+        }
     }
 }

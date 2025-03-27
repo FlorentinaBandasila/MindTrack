@@ -13,5 +13,6 @@ namespace MindTrack.Services.Interfaces
         Task<IEnumerable<Article>> GetAllArticles();
         Task<ArticleDTO> GetArticleById(Guid id);
         Task CreateArticle(Article article);
+        Task DeleteArticle(Guid id);
     }
 }
