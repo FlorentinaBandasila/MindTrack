@@ -1,4 +1,5 @@
-﻿using MindTrack.Models;
+﻿using Microsoft.AspNetCore.JsonPatch;
+using MindTrack.Models;
 using MindTrack.Models.DTOs;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,9 @@ namespace MindTrack.Services.Interfaces
     public interface IUserService
     {
         Task<IEnumerable<UserDTO>> GetAllUsers();
-        Task<UserDTO?> GetUserByUsername(string username);
+        Task<UserDTO> GetUserByUsername(string username);
         Task CreateUser(User user);
+        Task DeleteUser(Guid id);
+        Task<User> UpdateUser(string username, JsonPatchDocument<UserDTO> patchDoc);
     }
 }

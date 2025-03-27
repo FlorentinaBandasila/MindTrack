@@ -9,6 +9,7 @@ namespace MindTrack.Web.Mapper
         public MappingProfile() 
         {
             CreateMap<User, UserDTO>().ReverseMap();
+            CreateMap<Article, ArticleDTO>().ReverseMap();
         }
     }
 }

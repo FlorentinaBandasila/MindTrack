@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace MindTrack.Services
 {
@@ -27,15 +28,37 @@ namespace MindTrack.Services
             return _mapper.Map<IEnumerable<UserDTO>>(users);
         }
 
-        public async Task<UserDTO?> GetUserByUsername(string username)
+        public async Task<UserDTO> GetUserByUsername(string username)
         {
             var user = await _userRepository.GetUserByUsername(username);
-            return _mapper.Map<UserDTO?>(user);
+            return _mapper.Map<UserDTO>(user);
         }
 
         public async Task CreateUser(User user)
         {
             await _userRepository.CreateUser(user);
+        }
+
+        public async Task DeleteUser(Guid id)
+        {
+            await _userRepository.DeleteUser(id);
+        }
+
+        public async Task<User> UpdateUser(string username, JsonPatchDocument<UserDTO> patchDoc)
+        {
+            var user = await _userRepository.GetUserByUsername(username);
+            if (user == null)
+            {
+                throw new Exception($"User not found with username: {username}");
+            }
+
+            var userDto = _mapper.Map<UserDTO>(user);
+
+            patchDoc.ApplyTo(userDto);
+            _mapper.Map(userDto, user);
+
+            await _userRepository.UpdateUser(user);
+            return user;
         }
     }
 }

@@ -3,6 +3,7 @@ using MindTrack.Models.DTOs;
 using MindTrack.Models;
 using MindTrack.Services.Interfaces;
 using MindTrack.Services.Repositories;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace MindTrack.Web.Controllers
 {
@@ -17,7 +18,7 @@ namespace MindTrack.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllUsersAsync()
+        public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllUsers();
             if (users == null) return NotFound();
@@ -58,6 +59,34 @@ namespace MindTrack.Web.Controllers
             await _userService.CreateUser(user);
 
             return Ok("User created successfully");
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser([FromRoute] Guid id)
+        {
+            if(!ModelState.IsValid) return BadRequest(ModelState);
+
+            await _userService.DeleteUser(id);
+            return Ok("User deleted successfully");
+        }
+
+        [HttpPatch("{username}")]
+        public async Task<IActionResult> PatchUser(string username, [FromBody] JsonPatchDocument<UserDTO> patchDoc)
+        {
+            if (patchDoc == null)
+            {
+                return BadRequest("Patch document cannot be null.");
+            }
+
+            try
+            {
+                var updatedUser = await _userService.UpdateUser(username, patchDoc);
+                return Ok(updatedUser);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
     }
 }

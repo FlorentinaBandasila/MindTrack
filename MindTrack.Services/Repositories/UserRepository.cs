@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using MindTrack.Models;
 using MindTrack.Models.Data;
 using MindTrack.Services.Interfaces;
@@ -32,6 +33,22 @@ namespace MindTrack.Services.Repositories
         public async Task CreateUser(User user)
         {
             await _mindTrackContext.Users.AddAsync(user);
+            await _mindTrackContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteUser(Guid id)
+        {
+            var user = await _mindTrackContext.Users.FindAsync(id);
+
+            if (user != null) _mindTrackContext.Users.Remove(user);
+
+            await _mindTrackContext.SaveChangesAsync();
+
+        }
+
+        public async Task UpdateUser(User user)
+        {
+            _mindTrackContext.Users.Update(user);
             await _mindTrackContext.SaveChangesAsync();
         }
     }
