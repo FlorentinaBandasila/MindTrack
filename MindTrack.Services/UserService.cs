@@ -8,6 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using MindTrack.Models.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace MindTrack.Services
 {
@@ -15,11 +22,16 @@ namespace MindTrack.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
+        private readonly MindTrackContext _mindTrackContext;
 
-        public UserService(IUserRepository userRepository, IMapper mapper)
+        public UserService(IUserRepository userRepository, IMapper mapper, IConfiguration configuration, MindTrackContext
+            mindTrackContext)
         {
             _userRepository = userRepository;
             _mapper = mapper;
+            _configuration = configuration;
+            _mindTrackContext = mindTrackContext;
         }
 
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
@@ -34,9 +46,59 @@ namespace MindTrack.Services
             return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task CreateUser(User user)
+        public async Task<User> CreateUser(UserDTO request)
         {
+            var user = new User {
+                User_id = Guid.NewGuid(),
+                Username = request.Username,
+                Email = request.Email,
+                Phone = request.Phone,
+                Password = request.Password,
+                Full_name = request.Full_name,
+                Created = DateTime.Now
+            };
+
+            var hashedPassword = new PasswordHasher<User>()
+                 .HashPassword(user, request.Password);
+
+            user.Username = request.Username;
+            user.Password = hashedPassword;
+            
             await _userRepository.CreateUser(user);
+            return user;
+        }
+
+        public async Task<string?> Login(UserDTO request)
+        {
+            var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+            if (user is null) return null;
+            if (new PasswordHasher<User>().VerifyHashedPassword(user, user.Password, request.Password) ==
+                PasswordVerificationResult.Failed) return null;
+
+            return CreateToken(user);
+        }
+
+        private string CreateToken(User user)
+        {
+            var claims = new List<Claim>
+             {
+                 new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.User_id.ToString())
+             };
+
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token")!));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+            var tokenDescriptor = new JwtSecurityToken(
+                issuer: _configuration.GetValue<string>("AppSettings:Issuer"),
+                audience: _configuration.GetValue<string>("AppSettings:Audience"),
+                claims: claims,
+                expires: DateTime.Now.AddDays(1),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
 
         public async Task DeleteUser(Guid id)
