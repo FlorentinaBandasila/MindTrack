@@ -46,6 +46,12 @@ namespace MindTrack.Services
             return _mapper.Map<UserDTO>(user);
         }
 
+        public async Task<UserDTO> GetUserById(Guid id)
+        {
+            var user = await _userRepository.GetUserById(id);
+            return _mapper.Map<UserDTO>(user);
+        }
+
         public async Task<User> CreateUser(UserDTO request)
         {
             var user = new User {

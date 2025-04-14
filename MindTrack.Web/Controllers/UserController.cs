@@ -38,6 +38,17 @@ namespace MindTrack.Web.Controllers
             return Ok(user);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUserById(Guid id)
+        {
+            var user = await _userService.GetUserById(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        }
+
         //[HttpPost]
         //public async Task<IActionResult> AddUser([FromBody] UserDTO userDTO)
         //{

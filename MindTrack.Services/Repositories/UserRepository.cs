@@ -30,6 +30,11 @@ namespace MindTrack.Services.Repositories
             return await _mindTrackContext.Users.FirstOrDefaultAsync(r => r.Username == username);
         }
 
+        public async Task<User?> GetUserById(Guid id)
+        {
+            return await _mindTrackContext.Users.FirstOrDefaultAsync(r => r.User_id == id);
+        }
+
         public async Task CreateUser(User user)
         {
             await _mindTrackContext.Users.AddAsync(user);

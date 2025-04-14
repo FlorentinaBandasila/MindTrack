@@ -10,6 +10,7 @@ namespace MindTrack.Web.Mapper
         {
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<Article, ArticleDTO>().ReverseMap();
+            CreateMap<UserTask, UserTaskDTO>().ReverseMap();
         }
     }
 }

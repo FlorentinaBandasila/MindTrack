@@ -11,6 +11,7 @@ namespace MindTrack.Services.Interfaces
     {
         Task<IEnumerable<User>> GetAllUsers();
         Task<User> GetUserByUsername(string username);
+        Task<User> GetUserById(Guid id);
         Task CreateUser(User user);
         Task DeleteUser(Guid id);
         Task UpdateUser(User user);
