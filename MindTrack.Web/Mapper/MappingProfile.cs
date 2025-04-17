@@ -11,6 +11,11 @@ namespace MindTrack.Web.Mapper
             CreateMap<User, UserDTO>().ReverseMap();
             CreateMap<Article, ArticleDTO>().ReverseMap();
             CreateMap<UserTask, UserTaskDTO>().ReverseMap();
+            CreateMap<Answer, AnswerDTO>().ReverseMap();
+            CreateMap<Question, QuestionDTO>().ReverseMap();
+            CreateMap<Emotion, EmotionDTO>().ReverseMap();
+            CreateMap<MoodSelection, MoodSelectionDTO>().ReverseMap();
+            CreateMap<TaskCategory, TaskCategoryDTO>().ReverseMap();
         }
     }
 }

@@ -14,13 +14,15 @@ namespace MindTrack.Services
     {
         private readonly IUserTaskRepository _userTaskRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ITaskCategoryRepository _taskCategory;
         private readonly IMapper _mapper;
 
-        public UserTaskService(IUserTaskRepository userTaskRepository, IMapper mapper, IUserRepository userRepository)
+        public UserTaskService(IUserTaskRepository userTaskRepository, IMapper mapper, IUserRepository userRepository, ITaskCategoryRepository taskCategory)
         {
             _userTaskRepository = userTaskRepository;
             _mapper = mapper;
             _userRepository = userRepository;
+            _taskCategory = taskCategory;
         }
 
         public async Task<IEnumerable<UserTask>> GetAllUserTasks()
@@ -37,16 +39,17 @@ namespace MindTrack.Services
         public async Task CreateUserTask(UserTaskDTO userTaskDTO)
         {
             var user = await _userRepository.GetUserById(userTaskDTO.User_id);
+            var task = await _taskCategory.GetTaskCategoryById(userTaskDTO.Category_id);
             var userTaskModel = new UserTask
             {
                 Task_id = Guid.NewGuid(),
                 User_id = user.User_id,
-                Category_id = Guid.NewGuid(), //add later
+                Category_id = task.Category_id,
 
                 Title = userTaskDTO.Title,
-                Priority = userTaskDTO.Title,
-                Details = userTaskDTO.Title,
-                Status = userTaskDTO.Title,
+                Priority = userTaskDTO.Priority,
+                Details = userTaskDTO.Details,
+                Status = userTaskDTO.Status,
 
                 End_date = DateTime.Now,
                 Created_date = DateTime.Now

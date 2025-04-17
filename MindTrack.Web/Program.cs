@@ -86,6 +86,16 @@ builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
 builder.Services.AddScoped<IUserTaskRepository, UserTaskRepository>();
 builder.Services.AddScoped<IUserTaskService, UserTaskService>();
+builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
+builder.Services.AddScoped<IAnswerService, AnswerService>();
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<IEmotionRepository, EmotionRepository>();
+builder.Services.AddScoped<IEmotionService, EmotionService>();
+builder.Services.AddScoped<IMoodSelectionRepository, MoodSelectionRepository>();
+builder.Services.AddScoped<IMoodSelectionService, MoodSelectionService>();
+builder.Services.AddScoped<ITaskCategoryRepository, TaskCategoryRepository>();
+builder.Services.AddScoped<ITaskCategoryService, TaskCategoryService>();
 
 builder.Services.AddCors(options =>
 {

@@ -1,0 +1,46 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using MindTrack.Models.DTOs;
+using MindTrack.Services.Interfaces;
+
+namespace MindTrack.Web.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class EmotionController : ControllerBase
+    {
+        private readonly IEmotionService _emotionService;
+        public EmotionController(IEmotionService emotionService)
+        {
+            _emotionService = emotionService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllEmotions()
+        {
+            var emotions = await _emotionService.GetAllEmotions();
+            if (emotions == null) return NotFound();
+            return Ok(emotions);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetEmotionById(Guid id)
+        {
+            var emotion = await _emotionService.GetEmotionById(id);
+            if (emotion == null)
+            {
+                return NotFound();
+            }
+            return Ok(emotion);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddEmotion([FromBody] EmotionDTO emotionDTO)
+        {
+
+
+            await _emotionService.CreateEmotion(emotionDTO);
+
+            return Ok("Emotion saved successfully");
+        }
+    }
+}
