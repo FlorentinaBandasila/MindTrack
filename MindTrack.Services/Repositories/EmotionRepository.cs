@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MindTrack.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using MindTrack.Models.DTOs;
 
 namespace MindTrack.Services.Repositories
 {
@@ -32,6 +33,24 @@ namespace MindTrack.Services.Repositories
         {
             await _mindTrackContext.Emotions.AddAsync(emotion);
             await _mindTrackContext.SaveChangesAsync();
+        }
+
+        public async Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId)
+        {
+            var lastMonth = DateTime.UtcNow.AddMonths(-1);
+
+            var result = await _mindTrackContext.Emotions
+                .Where(e => e.User_id == userId && e.Date >= lastMonth)
+                .Include(e => e.Mood_selection) 
+                .GroupBy(e => e.Mood_selection.Mood) 
+                .Select(g => new MoodCountDTO
+                {
+                    MoodName = g.Key,
+                    Count = g.Count()
+                })
+                .ToListAsync();
+
+            return result;
         }
     }
 }

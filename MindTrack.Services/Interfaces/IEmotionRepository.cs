@@ -1,4 +1,5 @@
 ﻿using MindTrack.Models;
+using MindTrack.Models.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace MindTrack.Services.Interfaces
         Task<IEnumerable<Emotion>> GetAllEmotions();
         Task<Emotion> GetEmotionById(Guid id);
         Task CreateEmotion(Emotion emotion);
+        Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId);
     }
 }

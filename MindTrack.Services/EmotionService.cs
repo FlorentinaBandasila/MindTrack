@@ -14,13 +14,15 @@ namespace MindTrack.Services
     {
         private readonly IEmotionRepository _emotionRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IMoodSelectionRepository _moodSelectionRepository;
         private readonly IMapper _mapper;
 
-        public EmotionService(IEmotionRepository emotionRepository, IMapper mapper, IUserRepository userRepository)
+        public EmotionService(IEmotionRepository emotionRepository, IMapper mapper, IUserRepository userRepository, IMoodSelectionRepository moodSelectionRepository)
         {
             _emotionRepository = emotionRepository;
             _mapper = mapper;
             _userRepository = userRepository;
+            _moodSelectionRepository = moodSelectionRepository;
         }
 
         public async Task<IEnumerable<Emotion>> GetAllEmotions()
@@ -34,22 +36,26 @@ namespace MindTrack.Services
             var emotion = await _emotionRepository.GetEmotionById(id);
             return _mapper.Map<EmotionDTO>(emotion);
         }
-        public async Task CreateEmotion(EmotionDTO emotionDTO)
+        public async Task CreateEmotion(AddEmotionDTO emotionDTO)
         {
             var user = await _userRepository.GetUserById(emotionDTO.User_id);
-            Guid moodId = Guid.Parse("3fa85f64-5717-4562-b3fc-2c963f66afa4");
+            var mood = await _moodSelectionRepository.GetMoodSelectionById(emotionDTO.Mood_id);
+
             var emotionModel = new Emotion
             {
                 Emotion_id = Guid.NewGuid(),
                 User_id = user.User_id,
-                Mood_id = moodId, //add later
-
+                Mood_id = mood.Mood_id,
                 Reflection = emotionDTO.Reflection,
-
-                Date = DateTime.Now
+                Date = emotionDTO.Date
             };
 
             await _emotionRepository.CreateEmotion(emotionModel);
+        }
+
+        public async Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId)
+        {
+            return await _emotionRepository.GetUserEmotionsGroupedByMood(userId);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MindTrack.Models.DTOs;
 using MindTrack.Services.Interfaces;
+using MindTrack.Services.Repositories;
 
 namespace MindTrack.Web.Controllers
 {
@@ -34,13 +35,20 @@ namespace MindTrack.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddEmotion([FromBody] EmotionDTO emotionDTO)
+        public async Task<IActionResult> AddEmotion([FromBody] AddEmotionDTO emotionDTO)
         {
-
 
             await _emotionService.CreateEmotion(emotionDTO);
 
             return Ok("Emotion saved successfully");
         }
+
+        [HttpGet("user/{id}/mood-chart")]
+        public async Task<IActionResult> GetUserMoodReport(Guid id)
+        {
+            var result = await _emotionService.GetUserEmotionsGroupedByMood(id);
+            return Ok(result);
+        }
+
     }
 }
