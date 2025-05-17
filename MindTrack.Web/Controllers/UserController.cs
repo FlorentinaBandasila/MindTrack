@@ -27,7 +27,7 @@ namespace MindTrack.Web.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{username}")]
+        [HttpGet("username/{username}")]
         public async Task<IActionResult> GetUserByUsername(string username)
         {
             var user = await _userService.GetUserByUsername(username);

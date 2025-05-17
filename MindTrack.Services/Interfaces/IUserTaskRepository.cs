@@ -13,5 +13,7 @@ namespace MindTrack.Services.Interfaces
         Task<UserTask> GetUserTaskById(Guid id);
         Task CreateUserTask(UserTask userTask);
         Task DeleteUserTask(Guid id);
+        //Task<UserTask> GetCategoryByName(string categoryName);
+        //Task UpdateUserTask(UserTask userTask);
     }
 }

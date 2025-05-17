@@ -74,9 +74,9 @@ namespace MindTrack.Services
             return user;
         }
 
-        public async Task<string?> Login(UserDTO request)
+        public async Task<string?> Login(LoginDTO request)
         {
-            var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.Username == request.Username);
+            var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.Username == request.UserName);
             if (user is null) return null;
             if (new PasswordHasher<User>().VerifyHashedPassword(user, user.Password, request.Password) ==
                 PasswordVerificationResult.Failed) return null;

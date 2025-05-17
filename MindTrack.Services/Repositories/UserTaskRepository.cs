@@ -43,5 +43,10 @@ namespace MindTrack.Services.Repositories
             await _mindTrackContext.SaveChangesAsync();
 
         }
+
+        //public async Task<UserTask> GetCategoryByName(string taskName)
+        //{
+        //    return await _mindTrackContext.UserTasks.FirstOrDefaultAsync(t => t.Task_categories == taskName);
+        //}
     }
 }

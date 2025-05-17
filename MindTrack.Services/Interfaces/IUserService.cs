@@ -15,7 +15,7 @@ namespace MindTrack.Services.Interfaces
         Task<UserDTO> GetUserByUsername(string username);
         Task<UserDTO> GetUserById(Guid id);
         Task<User> CreateUser(UserDTO request);
-        Task<string> Login(UserDTO request);
+        Task<string> Login(LoginDTO request);
         Task DeleteUser(Guid id);
         Task<User> UpdateUser(string username, JsonPatchDocument<UserDTO> patchDoc);
     }
