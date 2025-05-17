@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace MindTrack.Web.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
