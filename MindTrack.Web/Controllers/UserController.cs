@@ -5,18 +5,23 @@ using MindTrack.Services.Interfaces;
 using MindTrack.Services.Repositories;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using MindTrack.Models.Data;
 
 namespace MindTrack.Web.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly MindTrackContext _mindTrackContext;
+        public UserController(IUserService userService, MindTrackContext mindTrackContext)
         {
             _userService = userService;
+            _mindTrackContext = mindTrackContext;
         }
 
         [HttpGet]
@@ -83,8 +88,8 @@ namespace MindTrack.Web.Controllers
             return Ok("User deleted successfully");
         }
 
-        [HttpPatch("{username}")]
-        public async Task<IActionResult> PatchUser(string username, [FromBody] JsonPatchDocument<UserDTO> patchDoc)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchUser(Guid id, [FromBody] JsonPatchDocument<UserDTO> patchDoc)
         {
             if (patchDoc == null)
             {
@@ -93,13 +98,27 @@ namespace MindTrack.Web.Controllers
 
             try
             {
-                var updatedUser = await _userService.UpdateUser(username, patchDoc);
+                var updatedUser = await _userService.UpdateUser(id, patchDoc);
                 return Ok(updatedUser);
             }
             catch (Exception ex)
             {
                 return NotFound(new { message = ex.Message });
             }
+        }
+
+        [HttpPut("update-avatar/{id}")]
+        public async Task<IActionResult> UpdateAvatar([FromBody] UpdateAvatarDTO dto, [FromRoute] Guid id)
+        {
+            var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.User_id == id);
+
+            if (user == null)
+                return NotFound();
+
+            user.Avatar = dto.Avatar;
+            await _mindTrackContext.SaveChangesAsync();
+
+            return Ok(new { avatar = user.Avatar });
         }
     }
 }

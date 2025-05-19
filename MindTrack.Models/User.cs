@@ -18,6 +18,7 @@ namespace MindTrack.Models
         public string Phone { get; set; }
         public string Full_name { get; set; }
         public DateTime Created { get; set; }
+        public string Avatar {  get; set; }
 
 
 

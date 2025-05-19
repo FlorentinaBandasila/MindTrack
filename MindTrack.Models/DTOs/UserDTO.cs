@@ -14,5 +14,6 @@ namespace MindTrack.Models.DTOs
         public string Email { get; set; }
         public string Phone { get; set; }
         public string Full_name { get; set; }
+        public string Avatar { get; set; }
     }
 }

@@ -61,7 +61,8 @@ namespace MindTrack.Services
                 Phone = request.Phone,
                 Password = request.Password,
                 Full_name = request.Full_name,
-                Created = DateTime.Now
+                Created = DateTime.Now,
+                Avatar = request.Avatar,
             };
 
             var hashedPassword = new PasswordHasher<User>()
@@ -112,12 +113,12 @@ namespace MindTrack.Services
             await _userRepository.DeleteUser(id);
         }
 
-        public async Task<User> UpdateUser(string username, JsonPatchDocument<UserDTO> patchDoc)
+        public async Task<User> UpdateUser(Guid id, JsonPatchDocument<UserDTO> patchDoc)
         {
-            var user = await _userRepository.GetUserByUsername(username);
+            var user = await _userRepository.GetUserById(id);
             if (user == null)
             {
-                throw new Exception($"User not found with username: {username}");
+                throw new Exception($"User not found with id: {id}");
             }
 
             var userDto = _mapper.Map<UserDTO>(user);
