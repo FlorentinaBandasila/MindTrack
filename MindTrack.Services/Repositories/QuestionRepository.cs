@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MindTrack.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using MindTrack.Models.DTOs;
 
 namespace MindTrack.Services.Repositories
 {
@@ -25,7 +26,7 @@ namespace MindTrack.Services.Repositories
 
         public async Task<Question> GetQuestionById(Guid id)
         {
-            return await _mindTrackContext.Questions.FirstOrDefaultAsync(a => a.Question_id == id);
+            return await _mindTrackContext.Questions.Include(q => q.Answers).FirstOrDefaultAsync(a => a.Question_id == id);
         }
 
         public async Task CreateQuestion(Question question)
@@ -34,5 +35,12 @@ namespace MindTrack.Services.Repositories
             await _mindTrackContext.SaveChangesAsync();
         }
 
+        public async Task<List<Question>> GetAllQuestionsWithAnswers()
+        {
+           return await _mindTrackContext.Questions
+                .Include(q => q.Answers)
+                .ToListAsync();
+           
+        }
     }
 }

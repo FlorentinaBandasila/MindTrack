@@ -14,13 +14,15 @@ namespace MindTrack.Services
     {
         private readonly IAnswerRepository _answerRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IQuestionRepository _questionRepository;
         private readonly IMapper _mapper;
 
-        public AnswerService(IAnswerRepository answerRepository, IMapper mapper, IUserRepository userRepository)
+        public AnswerService(IAnswerRepository answerRepository, IMapper mapper, IUserRepository userRepository, IQuestionRepository questionRepository)
         {
             _answerRepository = answerRepository;
             _mapper = mapper;
             _userRepository = userRepository;
+            _questionRepository = questionRepository;
         }
 
         public async Task<IEnumerable<Answer>> GetAllAnswers()
@@ -37,11 +39,11 @@ namespace MindTrack.Services
         public async Task CreateAnswer(AnswerDTO answerDTO)
         {
             var user = await _userRepository.GetUserById(answerDTO.Answer_id);
-            Guid questionId = Guid.Parse("3FA85F64-5717-4562-B3FC-2C963F66AFA6");
+            var questionId =await _questionRepository.GetQuestionById(answerDTO.Question_id);
             var answerModel = new Answer
             {
                 Answer_id = Guid.NewGuid(),
-                Question_id = questionId,  //add later
+                Question_id = questionId.Question_id,
 
                 Answer_name = answerDTO.Answer_name,
                 Points = answerDTO.Points,

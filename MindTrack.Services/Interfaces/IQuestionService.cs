@@ -13,5 +13,9 @@ namespace MindTrack.Services.Interfaces
         Task<IEnumerable<Question>> GetAllQuestions();
         Task<QuestionDTO> GetQuestionById(Guid id);
         Task CreateQuestion(Question question);
+
+        Task<List<QuestionQuizDTO>> GetAllQuestionsWithAnswers();
+
+        Task<int> CalculateTotalPoints(List<UserAnswerDTO> userAnswers);
     }
 }

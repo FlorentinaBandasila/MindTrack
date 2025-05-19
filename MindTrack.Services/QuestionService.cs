@@ -37,5 +37,44 @@ namespace MindTrack.Services
             await _questionRepository.CreateQuestion(question);
         }
 
+        public async Task<List<QuestionQuizDTO>> GetAllQuestionsWithAnswers()
+        {
+
+            var question = await _questionRepository.GetAllQuestionsWithAnswers();
+            var result = question.Select(q => new QuestionQuizDTO
+            {
+                Question_id = q.Question_id,
+                Title = q.Title,
+                Answers = q.Answers.Select(a => new AnswerQuizDTO
+                {
+                    Answer_id = a.Answer_id,
+                    Answer_name = a.Answer_name,
+                    Points = a.Points
+                }).ToList()
+            }).ToList();
+
+            return result;
+        }
+
+        public async Task<int> CalculateTotalPoints(List<UserAnswerDTO> userAnswers)
+        {
+            int totalPoints = 0;
+
+            foreach (var userAnswer in userAnswers)
+            {
+                var question = await _questionRepository.GetQuestionById(userAnswer.Question_id);
+                if (question != null)
+                {
+                    var answer = question.Answers.FirstOrDefault(a => a.Answer_id == userAnswer.Answer_id);
+                    if (answer != null)
+                    {
+                        totalPoints += answer.Points;
+                    }
+                }
+            }
+
+            return totalPoints;
+        }
+
     }
 }
