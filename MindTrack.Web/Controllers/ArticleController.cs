@@ -43,7 +43,8 @@ namespace MindTrack.Web.Controllers
                 Article_id = Guid.NewGuid(),
                 Title = articleDTO.Title,
                 Link = articleDTO.Link,
-                Created_date = DateTime.Now
+                Created_date = DateTime.Now,
+                Photo=articleDTO.Photo
             };
 
             await _articleService.CreateArticle(article);

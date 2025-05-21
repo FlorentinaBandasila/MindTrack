@@ -11,6 +11,7 @@ namespace MindTrack.Models.DTOs
         //public Guid Article_id { get; set; }
         public string Title { get; set; }
         public string Link { get; set; }
+        public string Photo { get; set; }
         //public DateTime Created_date { get; set; }
     }
 }

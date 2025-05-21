@@ -15,5 +15,6 @@ namespace MindTrack.Models
         public string Title { get; set; }
         public string Link {  get; set; }
         public DateTime Created_date { get; set; }
+        public string Photo { get; set; }
     }
 }
