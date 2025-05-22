@@ -14,6 +14,7 @@ namespace MindTrack.Services.Interfaces
         Task<EmotionDTO> GetEmotionById(Guid id);
         Task CreateEmotion(AddEmotionDTO emotionDTO);
 
-        Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId);
+        Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId, int year, int month);
+        Task<List<MoodDTO>> GetMoodByDay(Guid userId, int year, int month);
     }
 }

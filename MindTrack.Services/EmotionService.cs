@@ -53,9 +53,14 @@ namespace MindTrack.Services
             await _emotionRepository.CreateEmotion(emotionModel);
         }
 
-        public async Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId)
+        public async Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId, int year, int month)
         {
-            return await _emotionRepository.GetUserEmotionsGroupedByMood(userId);
+            return await _emotionRepository.GetUserEmotionsGroupedByMood(userId, year, month);
+        }
+
+        public async Task<List<MoodDTO>> GetMoodByDay(Guid userId, int year, int month)
+        {
+            return await _emotionRepository.GetMoodByDay(userId, year, month);
         }
     }
 }

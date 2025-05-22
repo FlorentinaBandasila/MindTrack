@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using MindTrack.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using MindTrack.Models.DTOs;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MindTrack.Services.Repositories
 {
@@ -35,14 +36,15 @@ namespace MindTrack.Services.Repositories
             await _mindTrackContext.SaveChangesAsync();
         }
 
-        public async Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId)
+        public async Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId, int year, int month)
         {
-            var lastMonth = DateTime.UtcNow.AddMonths(-1);
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1);
 
             var result = await _mindTrackContext.Emotions
-                .Where(e => e.User_id == userId && e.Date >= lastMonth)
-                .Include(e => e.Mood_selection) 
-                .GroupBy(e => e.Mood_selection.Mood) 
+                .Where(e => e.User_id == userId && e.Date >= startDate && e.Date < endDate)
+                .Include(e => e.Mood_selection)
+                .GroupBy(e => e.Mood_selection.Mood)
                 .Select(g => new MoodCountDTO
                 {
                     MoodName = g.Key,
@@ -50,6 +52,24 @@ namespace MindTrack.Services.Repositories
                 })
                 .ToListAsync();
 
+            return result;
+        }
+
+
+        public async Task<List<MoodDTO>> GetMoodByDay(Guid userId, int year, int month)
+        {
+            var startDate = new DateTime(year, month, 1);
+            var endDate = startDate.AddMonths(1);
+
+            var result = await _mindTrackContext.Emotions
+                .Where(e => e.User_id == userId && e.Date >= startDate && e.Date < endDate)
+                .Include(e => e.Mood_selection)
+                .Select(g => new MoodDTO
+                {
+                    Mood_Name = g.Mood_selection.Mood,
+                    Date = g.Date,
+                })
+                .ToListAsync();
             return result;
         }
     }

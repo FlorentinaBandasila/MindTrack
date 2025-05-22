@@ -13,6 +13,7 @@ namespace MindTrack.Services.Interfaces
         Task<IEnumerable<Emotion>> GetAllEmotions();
         Task<Emotion> GetEmotionById(Guid id);
         Task CreateEmotion(Emotion emotion);
-        Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId);
+        Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId, int year, int month);
+        Task<List<MoodDTO>> GetMoodByDay(Guid userId, int year, int month);
     }
 }

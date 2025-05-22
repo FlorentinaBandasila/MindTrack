@@ -43,10 +43,17 @@ namespace MindTrack.Web.Controllers
             return Ok("Emotion saved successfully");
         }
 
-        [HttpGet("user/{id}/mood-chart")]
-        public async Task<IActionResult> GetUserMoodReport(Guid id)
+        [HttpGet("user/{userId}/mood-chart")]
+        public async Task<IActionResult> GetUserEmotionsGroupedByMood(Guid userId, int year, int month)
         {
-            var result = await _emotionService.GetUserEmotionsGroupedByMood(id);
+            var result = await _emotionService.GetUserEmotionsGroupedByMood(userId, year, month);
+            return Ok(result);
+        }
+
+        [HttpGet("user/{userId}/by-day")]
+        public async Task<IActionResult> GetMoodByDay(Guid userId, int year, int month)
+        {
+            var result = await _emotionService.GetMoodByDay(userId, year, month);
             return Ok(result);
         }
 
