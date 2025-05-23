@@ -52,7 +52,7 @@ namespace MindTrack.Services
             return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<User> CreateUser(UserDTO request)
+        public async Task<User> CreateUser(UserRegisterDTO request)
         {
             var user = new User {
                 User_id = Guid.NewGuid(),
@@ -62,7 +62,7 @@ namespace MindTrack.Services
                 Password = request.Password,
                 Full_name = request.Full_name,
                 Created = DateTime.Now,
-                Avatar = request.Avatar,
+                Avatar = string.Empty,
             };
 
             var hashedPassword = new PasswordHasher<User>()
