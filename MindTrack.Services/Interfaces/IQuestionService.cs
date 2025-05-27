@@ -16,6 +16,6 @@ namespace MindTrack.Services.Interfaces
 
         Task<List<QuestionQuizDTO>> GetAllQuestionsWithAnswers();
 
-        Task<int> CalculateTotalPoints(List<UserAnswerDTO> userAnswers);
+        Task<QuizResults> SaveQuiz(Guid id, List<UserAnswerDTO> userAnswers);
     }
 }

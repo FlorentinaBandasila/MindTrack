@@ -29,6 +29,10 @@ namespace MindTrack.Services.Repositories
             return result;
         }
 
-
+        public async Task AddQuizResults(QuizResults result)
+        {
+            await _mindTrackContext.QuizResults.AddAsync(result);
+            await _mindTrackContext.SaveChangesAsync();
+        }
     }
 }

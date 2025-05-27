@@ -26,18 +26,24 @@ namespace MindTrack.Web.Controllers
             return Ok(questions);
         }
 
-        [HttpPost("submit-answers")]
-        public async Task<IActionResult> SubmitAnswers([FromBody] List<UserAnswerDTO> userAnswers)
+        [HttpPost("user/{id}/submit-answers")]
+        public async Task<IActionResult> SubmitAnswers([FromRoute] Guid id, [FromBody] List<UserAnswerDTO> userAnswers)
         {
             if (userAnswers == null || !userAnswers.Any())
                 return BadRequest("No answers submitted.");
 
-            var totalPoints = await _questionService.CalculateTotalPoints(userAnswers);
+            var result = await _questionService.SaveQuiz(id, userAnswers);
 
-            return Ok(new { TotalPoints = totalPoints });
+            return Ok(new
+            {
+                result.QuizResult_id,
+                result.Points,
+                result.Title,
+                result.Date
+            });
         }
 
-        [HttpGet("{id}/results")]
+        [HttpGet("user/{id}/results")]
         public async Task<IActionResult> GetQuizResults([FromRoute] Guid id)
         {
             var results = await _quizResultsService.GetQuizResultsByUser(id);

@@ -7,18 +7,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MindTrack.Services.Repositories;
 
 namespace MindTrack.Services
 {
     public class QuestionService : IQuestionService
     {
         private readonly IQuestionRepository _questionRepository;
+        private readonly IQuizResultsRepository _quizResultsRepository;
         private readonly IMapper _mapper;
 
-        public QuestionService(IQuestionRepository questionRepository, IMapper mapper)
+        public QuestionService(IQuestionRepository questionRepository, IMapper mapper, IQuizResultsRepository quizResultsRepository)
         {
             _questionRepository = questionRepository;
             _mapper = mapper;
+            _quizResultsRepository = quizResultsRepository;
         }
 
         public async Task<IEnumerable<Question>> GetAllQuestions()
@@ -56,25 +59,49 @@ namespace MindTrack.Services
             return result;
         }
 
-        public async Task<int> CalculateTotalPoints(List<UserAnswerDTO> userAnswers)
+        public async Task<QuizResults> SaveQuiz(Guid userId, List<UserAnswerDTO> userAnswers)
         {
-            int totalPoints = 0;
-
+            var totalPoints = 0;
             foreach (var userAnswer in userAnswers)
             {
                 var question = await _questionRepository.GetQuestionById(userAnswer.Question_id);
-                if (question != null)
-                {
-                    var answer = question.Answers.FirstOrDefault(a => a.Answer_id == userAnswer.Answer_id);
-                    if (answer != null)
-                    {
-                        totalPoints += answer.Points;
-                    }
-                }
+                if (question == null) continue;
+
+                var answer = question.Answers
+                    .FirstOrDefault(a => a.Answer_id == userAnswer.Answer_id);
+                if (answer != null)
+                    totalPoints += answer.Points;
             }
 
-            return totalPoints;
+            var title = GetTitleByScore(totalPoints);
+
+            var result = new QuizResults
+            {
+                QuizResult_id = Guid.NewGuid(),
+                User_id = userId,
+                Points = totalPoints,
+                Title = title,
+                Date = DateTime.UtcNow
+            };
+
+            await _quizResultsRepository.AddQuizResults(result);
+
+            return result;
         }
 
+        string GetTitleByScore(int score)
+        {
+            switch (score)
+            {
+                case < 0:
+                    return "Unknown";
+                case < 10:
+                    return "Needs Improvement";
+                case <= 15:
+                    return "Happy";
+                default:
+                    return "Ecstatic";
+            }
+        }
     }
 }

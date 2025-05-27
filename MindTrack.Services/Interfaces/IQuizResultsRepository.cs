@@ -11,5 +11,6 @@ namespace MindTrack.Services.Interfaces
     public interface IQuizResultsRepository
     {
         Task<QuizResults> GetQuizResultsByUser(Guid id);
+        Task AddQuizResults(QuizResults results);
     }
 }

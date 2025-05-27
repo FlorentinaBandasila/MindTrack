@@ -22,6 +22,7 @@ namespace MindTrack.Models
         public Guid User_id { get; set; }
         public string Title { get; set; }
         public int Points { get; set; }
+        public DateTime Date { get; set; }
         public User User { get; set; }
     }
 
