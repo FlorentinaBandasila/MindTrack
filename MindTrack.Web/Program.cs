@@ -96,6 +96,8 @@ builder.Services.AddScoped<IMoodSelectionRepository, MoodSelectionRepository>();
 builder.Services.AddScoped<IMoodSelectionService, MoodSelectionService>();
 builder.Services.AddScoped<ITaskCategoryRepository, TaskCategoryRepository>();
 builder.Services.AddScoped<ITaskCategoryService, TaskCategoryService>();
+builder.Services.AddScoped<IQuizResultsService, QuizResultsService>();
+builder.Services.AddScoped<IQuizResultsRepository, QuizResultsRepository>();
 
 builder.Services.AddCors(options =>
 {

@@ -30,6 +30,7 @@ namespace MindTrack.Models.Data
         public DbSet<Article> Articles { get; set; }
         public DbSet<UserTask> UserTasks { get; set; }
         public DbSet<TaskCategory> TaskCategories { get; set; }
+        public DbSet<QuizResults> QuizResults { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -59,6 +60,11 @@ namespace MindTrack.Models.Data
                 .HasOne(e => e.User)
                 .WithMany(u => u.Emotions)
                 .HasForeignKey(e => e.User_id);
+
+            modelBuilder.Entity<QuizResults>()
+                .HasOne(t => t.User)
+                .WithMany(u => u.QuizResults)
+                .HasForeignKey(t => t.User_id);
 
         }
     }

@@ -24,5 +24,6 @@ namespace MindTrack.Models
 
         public ICollection<Emotion> Emotions { get; set; }
         public ICollection<UserTask> UserTasks { get; set; }
+        public ICollection<QuizResults> QuizResults { get; set; }
     }
 }

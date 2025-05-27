@@ -10,10 +10,12 @@ namespace MindTrack.Web.Controllers
     public class QuizController : ControllerBase
     {
         private readonly  IQuestionService _questionService;
+        private readonly IQuizResultsService _quizResultsService;
 
-        public QuizController(IQuestionService questionService)
+        public QuizController(IQuestionService questionService, IQuizResultsService quizResultsService)
         {
             _questionService = questionService;
+            _quizResultsService = quizResultsService;
         }
 
         [HttpGet]
@@ -35,6 +37,12 @@ namespace MindTrack.Web.Controllers
             return Ok(new { TotalPoints = totalPoints });
         }
 
-
+        [HttpGet("{id}/results")]
+        public async Task<IActionResult> GetQuizResults([FromRoute] Guid id)
+        {
+            var results = await _quizResultsService.GetQuizResultsByUser(id);
+            if (results == null) return NotFound();
+            return Ok(results);
+        }
     }
 }
