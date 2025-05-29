@@ -31,6 +31,7 @@ namespace MindTrack.Services
             return _mapper.Map<IEnumerable<UserTask>>(userTasks);
         }
 
+
         public async Task<UserTaskDTO> GetUserTaskById(Guid id)
         {
             var userTask = await _userTaskRepository.GetUserTaskById(id);
