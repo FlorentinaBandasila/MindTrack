@@ -38,10 +38,9 @@ namespace MindTrack.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTaskCategory([FromBody] TaskCategoryDTO taskCategoryDTO)
         {
-            Guid taskCategoryId = Guid.Parse("854E0CA3-0D26-4E6D-B1A2-096020887FD1");
             var taskCategory = new TaskCategory
             {
-                Category_id = taskCategoryId,
+                Category_id = new Guid(),
                 Category_name = taskCategoryDTO.Category_name,
             };
 

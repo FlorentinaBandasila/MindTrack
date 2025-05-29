@@ -11,22 +11,28 @@ namespace MindTrack.Models
 {
     public class UserTask
     {
-        [Key] [Required] [NotNull]
+        [Key]
+        [Required]
+        [NotNull]
         public Guid Task_id { get; set; }
 
-        [ForeignKey("User_id")] [Required] [NotNull]
+        [ForeignKey("User_id")]
+        [Required]
+        [NotNull]
         public Guid User_id { get; set; }
 
-        [ForeignKey("Category_id")] [Required] [NotNull]
+        [ForeignKey("Category_id")]
+        [Required]
+        [NotNull]
         public Guid Category_id { get; set; }
         public string Title { get; set; }
         public string Priority { get; set; }
         public DateTime End_date { get; set; }
         public DateTime Created_date { get; set; }
-        public string Details { get;set; }
+        public string Details { get; set; }
         public string Status { get; set; }
 
         public User User { get; set; }
-        public ICollection<TaskCategory> Task_categories { get; set; }
+        public TaskCategory Task_categories { get; set; }
     }
 }

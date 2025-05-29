@@ -11,10 +11,10 @@ namespace MindTrack.Models
 {
     public class TaskCategory
     {
-        [Key] [Required] [NotNull]
+        [Key]
+        [Required]
+        [NotNull]
         public Guid Category_id { get; set; }
         public string Category_name { get; set; }
-
-        public UserTask UserTask { get; set; }
     }
 }

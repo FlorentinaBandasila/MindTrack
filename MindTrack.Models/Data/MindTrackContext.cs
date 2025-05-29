@@ -66,6 +66,11 @@ namespace MindTrack.Models.Data
                 .WithMany(u => u.QuizResults)
                 .HasForeignKey(t => t.User_id);
 
+            modelBuilder.Entity<UserTask>()
+                .HasOne(t => t.Task_categories)
+                .WithMany()
+                .HasForeignKey(t => t.Category_id);
+
         }
     }
 }

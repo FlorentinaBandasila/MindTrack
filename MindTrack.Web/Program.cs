@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+ï»¿using Microsoft.EntityFrameworkCore;
 using MindTrack.Models.Data;
 using MindTrack.Services;
 using MindTrack.Services.Interfaces;
@@ -107,11 +107,11 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5000);                 // http
-    options.ListenAnyIP(7035, o => o.UseHttps()); // https – same as launchSettings
-});
+//builder.WebHost.ConfigureKestrel(options =>
+//{
+//    options.ListenAnyIP(5000);                 // http
+//    options.ListenAnyIP(7035, o => o.UseHttps()); // https ï¿½ same as launchSettings
+//});
 
 
 var app = builder.Build();
@@ -120,23 +120,21 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        // 1) where your JSON livesiiii…
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "MindTrack API v1");
-        // 2) serve the UI at the app’s root instead of '/swagger'
-        c.RoutePrefix = string.Empty;
-    });
+    app.UseSwaggerUI();
+    //c =>
+    //{
+    //    // 1) where your JSON livesiiiiï¿½
+    //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "MindTrack API v1");
+    //    // 2) serve the UI at the appï¿½s root instead of '/swagger'
+    //    c.RoutePrefix = string.Empty;
+    //});
 }
-
-app.UseSwagger();
-app.UseSwaggerUI();
 
 
 // In Configure() method:
 app.UseCors("AllowAll");
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
