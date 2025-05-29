@@ -4,6 +4,8 @@ using MindTrack.Models;
 using MindTrack.Services;
 using MindTrack.Services.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using MindTrack.Models.Data;
 
 namespace MindTrack.Web.Controllers
 {
@@ -12,9 +14,11 @@ namespace MindTrack.Web.Controllers
     public class UserTaskController: ControllerBase
     {
         private readonly IUserTaskService _userTaskService;
-        public UserTaskController(IUserTaskService userTaskService)
+        private readonly MindTrackContext _mindTrackContext;
+        public UserTaskController(IUserTaskService userTaskService, MindTrackContext mindTrackContext)
         {
             _userTaskService = userTaskService;
+            _mindTrackContext = mindTrackContext;
         }
 
         [HttpGet]
@@ -53,6 +57,20 @@ namespace MindTrack.Web.Controllers
 
             await _userTaskService.DeleteUserTask(id);
             return Ok("User Task deleted successfully");
+        }
+
+        [HttpPut("{id}/update-status/")]
+        public async Task<IActionResult> UpdateAvatar([FromBody] UpdateTaskStatusDTO dto, [FromRoute] Guid id)
+        {
+            var user = await _mindTrackContext.UserTasks.FirstOrDefaultAsync(u => u.Task_id == id);
+
+            if (user == null)
+                return NotFound();
+
+            user.Status = dto.Status;
+            await _mindTrackContext.SaveChangesAsync();
+
+            return Ok(new { avatar = user.Status });
         }
     }
 }
