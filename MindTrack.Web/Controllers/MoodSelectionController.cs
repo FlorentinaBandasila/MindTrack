@@ -48,5 +48,14 @@ namespace MindTrack.Web.Controllers
 
             return Ok("Mood selected successfully");
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMoodSelection([FromRoute] Guid id)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            await _moodSelectionService.DeleteMoodSelection(id);
+            return Ok("Mood deleted successfully");
+        }
     }
 }

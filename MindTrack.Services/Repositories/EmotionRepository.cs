@@ -72,5 +72,23 @@ namespace MindTrack.Services.Repositories
                 .ToListAsync();
             return result;
         }
+
+        public async Task DeleteEmotion(Guid id)
+        {
+            var emotion = await _mindTrackContext.Emotions.FindAsync(id);
+
+            if (emotion != null) _mindTrackContext.Emotions.Remove(emotion);
+
+            await _mindTrackContext.SaveChangesAsync();
+
+        }
+
+        public async Task<Emotion?> GetEmotionByUserIdAndDate(Guid userId, DateTime date)
+        {
+            return await _mindTrackContext.Emotions
+                .Where(e => e.User_id == userId && e.Date.Date == date.Date)
+                .FirstOrDefaultAsync();
+        }
+
     }
 }

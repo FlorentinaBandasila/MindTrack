@@ -37,5 +37,10 @@ namespace MindTrack.Services
         {
             await _moodSelectionRepository.CreateMoodSelection(moodSelection);
         }
+
+        public async Task DeleteMoodSelection(Guid id)
+        {
+            await _moodSelectionRepository.DeleteMoodSelection(id);
+        }
     }
 }

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MindTrack.Services.Repositories;
 
 namespace MindTrack.Services
 {
@@ -41,6 +42,15 @@ namespace MindTrack.Services
             var user = await _userRepository.GetUserById(emotionDTO.User_id);
             var mood = await _moodSelectionRepository.GetMoodSelectionById(emotionDTO.Mood_id);
 
+            
+            var existingEmotion = await _emotionRepository
+                .GetEmotionByUserIdAndDate(user.User_id, emotionDTO.Date.Date); 
+
+            if (existingEmotion != null)
+            {
+                await _emotionRepository.DeleteEmotion(existingEmotion.Emotion_id);
+            }
+
             var emotionModel = new Emotion
             {
                 Emotion_id = Guid.NewGuid(),
@@ -53,6 +63,13 @@ namespace MindTrack.Services
             await _emotionRepository.CreateEmotion(emotionModel);
         }
 
+        public async Task<Emotion?> GetEmotionByUserIdAndDate(Guid userId, DateTime date)
+        {
+            return await _emotionRepository.GetEmotionByUserIdAndDate(userId, date.Date);
+        }
+
+
+
         public async Task<List<MoodCountDTO>> GetUserEmotionsGroupedByMood(Guid userId, int year, int month)
         {
             return await _emotionRepository.GetUserEmotionsGroupedByMood(userId, year, month);
@@ -61,6 +78,11 @@ namespace MindTrack.Services
         public async Task<List<MoodDTO>> GetMoodByDay(Guid userId, int year, int month)
         {
             return await _emotionRepository.GetMoodByDay(userId, year, month);
+        }
+
+        public async Task DeleteEmotion(Guid id)
+        {
+            await _emotionRepository.DeleteEmotion(id);
         }
     }
 }

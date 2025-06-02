@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MindTrack.Models.DTOs;
+using MindTrack.Services;
 using MindTrack.Services.Interfaces;
 using MindTrack.Services.Repositories;
 
@@ -55,6 +56,15 @@ namespace MindTrack.Web.Controllers
         {
             var result = await _emotionService.GetMoodByDay(userId, year, month);
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEmotion([FromRoute] Guid id)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            await _emotionService.DeleteEmotion(id);
+            return Ok("Emotion deleted successfully");
         }
 
     }

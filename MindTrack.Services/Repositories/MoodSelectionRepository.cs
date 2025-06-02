@@ -33,5 +33,15 @@ namespace MindTrack.Services.Repositories
             await _mindTrackContext.MoodSelections.AddAsync(moodSelection);
             await _mindTrackContext.SaveChangesAsync();
         }
+
+        public async Task DeleteMoodSelection(Guid id)
+        {
+            var mood = await _mindTrackContext.MoodSelections.FindAsync(id);
+
+            if (mood != null) _mindTrackContext.MoodSelections.Remove(mood);
+
+            await _mindTrackContext.SaveChangesAsync();
+
+        }
     }
 }

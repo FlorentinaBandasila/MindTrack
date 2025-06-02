@@ -13,5 +13,6 @@ namespace MindTrack.Services.Interfaces
         Task<IEnumerable<MoodSelection>> GetAllMoodSelections();
         Task<MoodSelectionDTO> GetMoodSelectionById(Guid id);
         Task CreateMoodSelection(MoodSelection moodSelection);
+        Task DeleteMoodSelection(Guid id);
     }
 }
