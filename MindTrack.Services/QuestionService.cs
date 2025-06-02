@@ -95,9 +95,9 @@ namespace MindTrack.Services
             {
                 case < 0:
                     return "Unknown";
-                case < 10:
+                case < 40:
                     return "Needs Improvement";
-                case <= 15:
+                case <= 70:
                     return "Happy";
                 default:
                     return "Ecstatic";
