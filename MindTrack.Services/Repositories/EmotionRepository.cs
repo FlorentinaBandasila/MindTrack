@@ -55,6 +55,22 @@ namespace MindTrack.Services.Repositories
             return result;
         }
 
+        public async Task<List<JournalDTO>> GetMoodByUser(Guid userId)
+        {
+            return await _mindTrackContext.Emotions
+                .Where(e => e.User_id == userId)
+                .Include(e => e.Mood_selection)
+                .Select(e => new JournalDTO
+                {
+                    Mood_Name = e.Mood_selection.Mood,
+                    Reflection = e.Reflection,
+                    Date = e.Date
+                }).OrderByDescending(e => e.Date)
+                .ToListAsync();
+        }
+
+
+
 
         public async Task<List<MoodDTO>> GetMoodByDay(Guid userId, int year, int month)
         {

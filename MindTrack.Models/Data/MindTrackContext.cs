@@ -31,6 +31,7 @@ namespace MindTrack.Models.Data
         public DbSet<UserTask> UserTasks { get; set; }
         public DbSet<TaskCategory> TaskCategories { get; set; }
         public DbSet<QuizResults> QuizResults { get; set; }
+        public DbSet<RecommendedTask> RecommendedTasks{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -67,7 +68,7 @@ namespace MindTrack.Models.Data
                 .HasForeignKey(t => t.User_id);
 
             modelBuilder.Entity<UserTask>()
-                .HasOne(t => t.Task_categories)
+                .HasOne(t => t.TaskCategory)
                 .WithMany()
                 .HasForeignKey(t => t.Category_id);
 

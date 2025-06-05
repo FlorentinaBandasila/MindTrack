@@ -37,6 +37,12 @@ namespace MindTrack.Services
             var emotion = await _emotionRepository.GetEmotionById(id);
             return _mapper.Map<EmotionDTO>(emotion);
         }
+
+        public async Task<List<JournalDTO>> GetMoodByUser(Guid userId)
+        {
+            return await _emotionRepository.GetMoodByUser(userId);
+        }
+
         public async Task CreateEmotion(AddEmotionDTO emotionDTO)
         {
             var user = await _userRepository.GetUserById(emotionDTO.User_id);

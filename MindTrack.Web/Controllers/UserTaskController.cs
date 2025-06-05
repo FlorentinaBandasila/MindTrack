@@ -11,14 +11,16 @@ namespace MindTrack.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserTaskController: ControllerBase
+    public class UserTaskController : ControllerBase
     {
         private readonly IUserTaskService _userTaskService;
+        private readonly IRecommendedTaskService _recommendedTaskService;
         private readonly MindTrackContext _mindTrackContext;
-        public UserTaskController(IUserTaskService userTaskService, MindTrackContext mindTrackContext)
+        public UserTaskController(IUserTaskService userTaskService, MindTrackContext mindTrackContext, IRecommendedTaskService recommendedTaskService)
         {
             _userTaskService = userTaskService;
             _mindTrackContext = mindTrackContext;
+            _recommendedTaskService = recommendedTaskService;
         }
 
         [HttpGet]
@@ -60,7 +62,7 @@ namespace MindTrack.Web.Controllers
         }
 
         [HttpPut("{id}/update-status/")]
-        public async Task<IActionResult> UpdateAvatar([FromBody] UpdateTaskStatusDTO dto, [FromRoute] Guid id)
+        public async Task<IActionResult> UpdateStatus([FromBody] UpdateTaskStatusDTO dto, [FromRoute] Guid id)
         {
             var user = await _mindTrackContext.UserTasks.FirstOrDefaultAsync(u => u.Task_id == id);
 
@@ -70,7 +72,63 @@ namespace MindTrack.Web.Controllers
             user.Status = dto.Status;
             await _mindTrackContext.SaveChangesAsync();
 
-            return Ok(new { avatar = user.Status });
+            return Ok(new { status = user.Status });
         }
+
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetTasksForToday(Guid userId)
+        {
+            // ✅ Recomandă 2 taskuri noi pentru azi, dacă nu le are deja
+            await _recommendedTaskService.AssignDailyRecommendedTasks(userId);
+
+            // ✅ Returnează toate taskurile userului, ordonate descrescător
+            var tasks = await _userTaskService.GetUserTasksForUser(userId);
+
+            return Ok(tasks);
+        }
+
+        [HttpGet("user/{userId}/weekly-progress")]
+        public async Task<ActionResult<WeeklyProgressDTO>> GetWeeklyProgress(Guid userId)
+        {
+            var today = DateTime.Today;
+            var startOfWeek = today.AddDays(-(int)today.DayOfWeek + (int)DayOfWeek.Monday);
+            var endOfWeek = today.AddDays(7 - (int)today.DayOfWeek);
+
+            var userTasks = await _mindTrackContext.UserTasks
+                .Where(t => t.User_id == userId)
+                .ToListAsync();
+
+            // Relevant recommended tasks (all, regardless of status)
+            var recommended = userTasks
+                .Where(t => t.Recommended_Task_Id != null)
+                .ToList();
+
+            // Relevant user-added tasks (this week, until Sunday)
+            var userAdded = userTasks
+                .Where(t =>
+                    t.Recommended_Task_Id == null &&
+                    t.Created_date >= startOfWeek &&
+                    t.End_date <= endOfWeek)
+                .ToList();
+
+            var relevantTasks = recommended.Concat(userAdded).ToList();
+
+            var completedTasks = relevantTasks
+                .Count(t => t.Status == "done");
+
+            var totalTasks = relevantTasks.Count;
+            var percentage = totalTasks == 0 ? 100 : (completedTasks * 100) / totalTasks;
+
+            var result = new WeeklyProgressDTO
+            {
+                Percentage = percentage,
+                TotalTasks = totalTasks,
+                CompletedTasks = completedTasks
+            };
+
+            return Ok(result);
+        }
+
+
     }
 }

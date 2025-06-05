@@ -20,6 +20,7 @@ namespace MindTrack.Web.Mapper
             CreateMap<Question, QuestionQuizDTO>().ReverseMap();
             CreateMap<MoodSelection, MoodDTO>().ReverseMap();
             CreateMap<QuizResults, QuizResultsDTO>().ReverseMap();
+            CreateMap<Emotion, JournalDTO>().ReverseMap();
         }
     }
 }

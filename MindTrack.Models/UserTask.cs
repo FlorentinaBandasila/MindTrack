@@ -13,18 +13,16 @@ namespace MindTrack.Models
     {
         [Key]
         [Required]
-        [NotNull]
         public Guid Task_id { get; set; }
 
-        [ForeignKey("User_id")]
         [Required]
-        [NotNull]
         public Guid User_id { get; set; }
 
-        [ForeignKey("Category_id")]
         [Required]
-        [NotNull]
         public Guid Category_id { get; set; }
+
+        public Guid? Recommended_Task_Id { get; set; }
+
         public string Title { get; set; }
         public string Priority { get; set; }
         public DateTime End_date { get; set; }
@@ -32,7 +30,15 @@ namespace MindTrack.Models
         public string Details { get; set; }
         public string Status { get; set; }
 
+        // ✅ Navigații corect configurate
+        [ForeignKey(nameof(User_id))]
         public User User { get; set; }
-        public TaskCategory Task_categories { get; set; }
+
+        [ForeignKey(nameof(Category_id))]
+        public TaskCategory TaskCategory { get; set; }
+
+        [ForeignKey(nameof(Recommended_Task_Id))]
+        public RecommendedTask RecommendedTask { get; set; }
     }
+
 }

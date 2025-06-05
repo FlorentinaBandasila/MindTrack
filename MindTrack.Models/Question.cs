@@ -15,6 +15,8 @@ namespace MindTrack.Models
         public string Title { get; set; }
         public DateTime Created_date { get; set; }
 
+        public string Category { get; set; }
+
         public ICollection<Answer> Answers { get; set; }
     }
 }

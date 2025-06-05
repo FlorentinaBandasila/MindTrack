@@ -44,6 +44,14 @@ namespace MindTrack.Web.Controllers
             return Ok("Emotion saved successfully");
         }
 
+        [HttpGet("user/{userId}/journal-by-user")]
+        public async Task<IActionResult> GetMoodsByUser([FromRoute] Guid userId)
+        {
+            var emotions = await _emotionService.GetMoodByUser(userId);
+            if (emotions == null) return NotFound();
+            return Ok(emotions);
+        }
+
         [HttpGet("user/{userId}/mood-chart")]
         public async Task<IActionResult> GetUserEmotionsGroupedByMood(Guid userId, int year, int month)
         {

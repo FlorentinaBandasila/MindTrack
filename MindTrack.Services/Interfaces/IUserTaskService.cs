@@ -14,5 +14,6 @@ namespace MindTrack.Services.Interfaces
         Task<UserTaskDTO> GetUserTaskById(Guid id);
         Task CreateUserTask(UserTaskDTO userTaskDTO);
         Task DeleteUserTask(Guid id);
+        Task<IEnumerable<UserTaskDTO>> GetUserTasksForUser(Guid userId);
     }
 }

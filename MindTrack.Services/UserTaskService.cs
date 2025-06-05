@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using MindTrack.Models.Data;
 
 namespace MindTrack.Services
 {
@@ -15,15 +17,23 @@ namespace MindTrack.Services
         private readonly IUserTaskRepository _userTaskRepository;
         private readonly IUserRepository _userRepository;
         private readonly ITaskCategoryRepository _taskCategory;
+        private readonly MindTrackContext _context;
         private readonly IMapper _mapper;
 
-        public UserTaskService(IUserTaskRepository userTaskRepository, IMapper mapper, IUserRepository userRepository, ITaskCategoryRepository taskCategory)
+        public UserTaskService(
+            IUserTaskRepository userTaskRepository,
+            IMapper mapper,
+            IUserRepository userRepository,
+            ITaskCategoryRepository taskCategory,
+            MindTrackContext context) // 👈 adăugat aici
         {
             _userTaskRepository = userTaskRepository;
             _mapper = mapper;
             _userRepository = userRepository;
             _taskCategory = taskCategory;
+            _context = context; // 👈 acum îl setezi
         }
+
 
         public async Task<IEnumerable<UserTask>> GetAllUserTasks()
         {
@@ -64,5 +74,16 @@ namespace MindTrack.Services
         {
             await _userTaskRepository.DeleteUserTask(id);
         }
+
+        public async Task<IEnumerable<UserTaskDTO>> GetUserTasksForUser(Guid userId)
+        {
+            var userTasks = await _context.UserTasks
+                .Where(u => u.User_id == userId)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<UserTaskDTO>>(userTasks);
+        }
+
+
     }
 }

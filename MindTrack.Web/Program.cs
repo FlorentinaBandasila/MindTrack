@@ -98,6 +98,8 @@ builder.Services.AddScoped<ITaskCategoryRepository, TaskCategoryRepository>();
 builder.Services.AddScoped<ITaskCategoryService, TaskCategoryService>();
 builder.Services.AddScoped<IQuizResultsService, QuizResultsService>();
 builder.Services.AddScoped<IQuizResultsRepository, QuizResultsRepository>();
+builder.Services.AddScoped<IRecommendedTaskRepository, RecommendedTaskRepository>();
+builder.Services.AddScoped<IRecommendedTaskService, RecommendedTaskService>();
 
 builder.Services.AddCors(options =>
 {

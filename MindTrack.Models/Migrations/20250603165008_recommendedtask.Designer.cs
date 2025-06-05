@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MindTrack.Models.Data;
 
@@ -11,9 +12,11 @@ using MindTrack.Models.Data;
 namespace MindTrack.Models.Migrations
 {
     [DbContext(typeof(MindTrackContext))]
-    partial class MindTrackContextModelSnapshot : ModelSnapshot
+    [Migration("20250603165008_recommendedtask")]
+    partial class recommendedtask
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,10 +125,6 @@ namespace MindTrack.Models.Migrations
                     b.Property<Guid>("Question_id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Created_date")
                         .HasColumnType("datetime2");
@@ -278,9 +277,6 @@ namespace MindTrack.Models.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("Recommended_Task_Id")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -295,8 +291,6 @@ namespace MindTrack.Models.Migrations
                     b.HasKey("Task_id");
 
                     b.HasIndex("Category_id");
-
-                    b.HasIndex("Recommended_Task_Id");
 
                     b.HasIndex("User_id");
 
@@ -346,15 +340,11 @@ namespace MindTrack.Models.Migrations
 
             modelBuilder.Entity("MindTrack.Models.UserTask", b =>
                 {
-                    b.HasOne("MindTrack.Models.TaskCategory", "TaskCategory")
+                    b.HasOne("MindTrack.Models.TaskCategory", "Task_categories")
                         .WithMany()
                         .HasForeignKey("Category_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("MindTrack.Models.RecommendedTask", "RecommendedTask")
-                        .WithMany()
-                        .HasForeignKey("Recommended_Task_Id");
 
                     b.HasOne("MindTrack.Models.User", "User")
                         .WithMany("UserTasks")
@@ -362,9 +352,7 @@ namespace MindTrack.Models.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("RecommendedTask");
-
-                    b.Navigation("TaskCategory");
+                    b.Navigation("Task_categories");
 
                     b.Navigation("User");
                 });
