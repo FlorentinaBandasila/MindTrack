@@ -77,13 +77,18 @@ namespace MindTrack.Services
 
         public async Task<string?> Login(LoginDTO request)
         {
-            var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.Username == request.UserName);
+            var user = await _mindTrackContext.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Identifier || u.Username == request.Identifier);
+
             if (user is null) return null;
+
             if (new PasswordHasher<User>().VerifyHashedPassword(user, user.Password, request.Password) ==
-                PasswordVerificationResult.Failed) return null;
+                PasswordVerificationResult.Failed)
+                return null;
 
             return CreateToken(user);
         }
+
 
         private string CreateToken(User user)
         {
@@ -113,21 +118,6 @@ namespace MindTrack.Services
             await _userRepository.DeleteUser(id);
         }
 
-        public async Task<User> UpdateUser(Guid id, JsonPatchDocument<UserDTO> patchDoc)
-        {
-            var user = await _userRepository.GetUserById(id);
-            if (user == null)
-            {
-                throw new Exception($"User not found with id: {id}");
-            }
-
-            var userDto = _mapper.Map<UserDTO>(user);
-
-            patchDoc.ApplyTo(userDto);
-            _mapper.Map(userDto, user);
-
-            await _userRepository.UpdateUser(user);
-            return user;
-        }
+        
     }
 }

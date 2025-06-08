@@ -25,13 +25,13 @@ namespace MindTrack.Services
             IMapper mapper,
             IUserRepository userRepository,
             ITaskCategoryRepository taskCategory,
-            MindTrackContext context) // 👈 adăugat aici
+            MindTrackContext context)
         {
             _userTaskRepository = userTaskRepository;
             _mapper = mapper;
             _userRepository = userRepository;
             _taskCategory = taskCategory;
-            _context = context; // 👈 acum îl setezi
+            _context = context;
         }
 
 

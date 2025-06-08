@@ -45,26 +45,23 @@ namespace MindTrack.Services
 
         public async Task<List<QuestionQuizDTO>> GetAllQuestionsWithAnswers()
         {
-            // Define custom category order
             var categoryOrder = new List<string>
             {
-                "1. Fatigue Severity",
-                "2.1. Emotional State(Positive Affect)",
-                "2.2. Emotional State(Negative Affect)",
-                "3. Physical Activity & Lifestyle",
-                "4. Anxiety Symptoms"
+                "Anxiety",
+                "Depression",
+                "Positive",
             };
 
             var questions = await _questionRepository.GetAllQuestionsWithAnswers();
 
             var result = questions
-                .OrderBy(q => categoryOrder.IndexOf(q.Category)) // Order by category priority
+                .OrderBy(q => categoryOrder.IndexOf(q.Category)) 
                 .Select(q => new QuestionQuizDTO
                 {
                     Question_id = q.Question_id,
                     Title = q.Title,
                     Answers = q.Answers
-                        .OrderBy(a => a.Points) // Order answers by points
+                        .OrderBy(a => a.Points)
                         .Select(a => new AnswerQuizDTO
                         {
                             Answer_id = a.Answer_id,
@@ -97,12 +94,19 @@ namespace MindTrack.Services
                 }
             }
 
+            int depressionScore = categoryScores.GetValueOrDefault("Depression", 0); 
+            int anxietyScore = categoryScores.GetValueOrDefault("Anxiety", 0);      
+            int wellbeingScore = categoryScores.GetValueOrDefault("Positive", 0);  
+
+            int vpi = depressionScore + anxietyScore;
+            int ri = wellbeingScore;
+
             var result = new QuizResults
             {
                 QuizResult_id = Guid.NewGuid(),
                 User_id = userId,
-                Points = categoryScores.Values.Sum(),
-                Title = GetTitleByScore(categoryScores),
+                Points = vpi + ri,
+                Title = GetTitleByScore(vpi, ri),
                 Date = DateTime.UtcNow
             };
 
@@ -110,20 +114,34 @@ namespace MindTrack.Services
             return result;
         }
 
-        private string GetTitleByScore(Dictionary<string, int> scores)
+        private string GetTitleByScore(int vpi, int ri)
         {
-            int fatigue = scores.GetValueOrDefault("Fatigue", 0);
-            int pa = scores.GetValueOrDefault("Positive Affect", 0);
-            int na = scores.GetValueOrDefault("Negative Affect", 0);
-            int physical = scores.GetValueOrDefault("Physical Activity", 0);
-            int anxiety = scores.GetValueOrDefault("Anxiety", 0);
+            if (vpi <= 9 && ri >= 30)
+                return "Mental health thriving – resilient and stable";
 
-         
-            if (fatigue <= 25 && pa >= 40 && na <= 10 && physical <= 5 && anxiety <= 10)
-                return "Optimal Wellness";
+            if (vpi <= 9 && ri < 30)
+                return "Stable but low positivity – monitor well-being";
 
-            if (fatigue == 70 && pa <= 10 && na >= 40 && physical == 17 && anxiety >= 51)
-                return "Chronic Fatigue & High Anxiety";
+            if (vpi <= 19 && ri >= 30)
+                return "Mild symptoms but emotionally resilient";
+
+            if (vpi <= 19 && ri < 30)
+                return "Mild vulnerability with emotional fatigue";
+
+            if (vpi <= 29 && ri >= 30)
+                return "Moderate distress but showing resilience";
+
+            if (vpi <= 29 && ri < 30)
+                return "Moderate distress with low resilience";
+
+            if (vpi <= 39 && ri >= 30)
+                return "Severe symptoms but retains emotional strength";
+
+            if (vpi <= 39 && ri < 30)
+                return "Severe mental health strain – low resilience";
+
+            if (vpi <= 48)
+                return "Critical distress – immediate support needed";
 
             return "Uncategorized Profile";
         }

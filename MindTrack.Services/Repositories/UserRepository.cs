@@ -51,10 +51,6 @@ namespace MindTrack.Services.Repositories
 
         }
 
-        public async Task UpdateUser(User user)
-        {
-            _mindTrackContext.Users.Update(user);
-            await _mindTrackContext.SaveChangesAsync();
-        }
+       
     }
 }

@@ -35,7 +35,7 @@ namespace MindTrack.Services
 
             var filteredTasks = recommendedTasks
                 .Where(t => t.Mood != null && t.Mood.Equals(mood, StringComparison.OrdinalIgnoreCase))
-                .Take(2)
+                .Take(1)
                 .ToList();
 
             foreach (var task in filteredTasks)
@@ -49,29 +49,31 @@ namespace MindTrack.Services
         {
             var today = DateTime.Today;
 
-            // Obține mood-ul din quiz (titlul)
+            bool hasTodayTask = await _context.UserTasks
+                .AnyAsync(ut => ut.User_id == userId
+                                && ut.Recommended_Task_Id != null
+                                && ut.Created_date.Date == today);
+
+            if (hasTodayTask)
+            {
+                Console.WriteLine("User already has a recommended task for today.");
+                return;
+            }
+
             var quizResultDto = await _quizResultsService.GetQuizResultsByUser(userId);
             if (quizResultDto == null || string.IsNullOrEmpty(quizResultDto.Title))
                 return;
 
             var mood = quizResultDto.Title;
 
-
             var alreadyUsedTaskIds = await _context.UserTasks
                 .Where(ut => ut.User_id == userId && ut.Recommended_Task_Id != null)
                 .Select(ut => ut.Recommended_Task_Id.Value)
-                .ToListAsync() ?? new List<Guid>(); // fallback dacă ar fi null (deși EF nu ar trebui)
+                .ToListAsync() ?? new List<Guid>();
 
-            if (!alreadyUsedTaskIds.Any())
-            {
-                alreadyUsedTaskIds = new List<Guid>(); // asigurare extra, defensiv
-            }
-
-
-            // Selectează 2 taskuri NOI, care nu au mai fost atribuite acestui user
             var newRecommendedTasks = await _context.RecommendedTasks
                 .Where(rt => rt.Mood == mood && !alreadyUsedTaskIds.Contains(rt.Recommended_Task_Id))
-                .OrderBy(r => Guid.NewGuid()) // random
+                .OrderBy(r => Guid.NewGuid()) 
                 .Take(1)
                 .ToListAsync();
 

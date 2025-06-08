@@ -75,13 +75,12 @@ namespace MindTrack.Web.Controllers
             return Ok(new { status = user.Status });
         }
 
-        [HttpGet("user/{userId}")]
+        [HttpGet("user/{userId}/today")]
         public async Task<IActionResult> GetTasksForToday(Guid userId)
         {
-            // ✅ Recomandă 2 taskuri noi pentru azi, dacă nu le are deja
+            
             await _recommendedTaskService.AssignDailyRecommendedTasks(userId);
 
-            // ✅ Returnează toate taskurile userului, ordonate descrescător
             var tasks = await _userTaskService.GetUserTasksForUser(userId);
 
             return Ok(tasks);
@@ -98,12 +97,10 @@ namespace MindTrack.Web.Controllers
                 .Where(t => t.User_id == userId)
                 .ToListAsync();
 
-            // Relevant recommended tasks (all, regardless of status)
             var recommended = userTasks
                 .Where(t => t.Recommended_Task_Id != null)
                 .ToList();
 
-            // Relevant user-added tasks (this week, until Sunday)
             var userAdded = userTasks
                 .Where(t =>
                     t.Recommended_Task_Id == null &&

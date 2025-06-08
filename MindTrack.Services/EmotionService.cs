@@ -52,11 +52,6 @@ namespace MindTrack.Services
             var existingEmotion = await _emotionRepository
                 .GetEmotionByUserIdAndDate(user.User_id, emotionDTO.Date.Date); 
 
-            if (existingEmotion != null)
-            {
-                await _emotionRepository.DeleteEmotion(existingEmotion.Emotion_id);
-            }
-
             var emotionModel = new Emotion
             {
                 Emotion_id = Guid.NewGuid(),

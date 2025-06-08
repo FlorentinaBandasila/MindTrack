@@ -24,7 +24,7 @@ namespace MindTrack.Web.Controllers
         public async Task<ActionResult<string>> Login(LoginDTO request)
         {
             var token = await userService.Login(request);
-            if (token is null) return BadRequest("Invalid password or username");
+            if (token is null) return BadRequest("Invalid password or email");
 
             return Ok(token);
         }

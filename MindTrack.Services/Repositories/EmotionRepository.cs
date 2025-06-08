@@ -41,19 +41,29 @@ namespace MindTrack.Services.Repositories
             var startDate = new DateTime(year, month, 1);
             var endDate = startDate.AddMonths(1);
 
-            var result = await _mindTrackContext.Emotions
+            var emotions = await _mindTrackContext.Emotions
                 .Where(e => e.User_id == userId && e.Date >= startDate && e.Date < endDate)
                 .Include(e => e.Mood_selection)
+                .ToListAsync();
+
+            var latestEmotionsPerDay = emotions
+                .GroupBy(e => e.Date.Date)
+                .Select(g => g.OrderByDescending(e => e.Date).FirstOrDefault())
+                .Where(e => e != null && e.Mood_selection != null)
+                .ToList();
+
+            var result = latestEmotionsPerDay
                 .GroupBy(e => e.Mood_selection.Mood)
                 .Select(g => new MoodCountDTO
                 {
                     MoodName = g.Key,
                     Count = g.Count()
                 })
-                .ToListAsync();
+                .ToList();
 
             return result;
         }
+
 
         public async Task<List<JournalDTO>> GetMoodByUser(Guid userId)
         {
@@ -77,16 +87,23 @@ namespace MindTrack.Services.Repositories
             var startDate = new DateTime(year, month, 1);
             var endDate = startDate.AddMonths(1);
 
-            var result = await _mindTrackContext.Emotions
+            var emotions = await _mindTrackContext.Emotions
                 .Where(e => e.User_id == userId && e.Date >= startDate && e.Date < endDate)
                 .Include(e => e.Mood_selection)
-                .Select(g => new MoodDTO
-                {
-                    Mood_Name = g.Mood_selection.Mood,
-                    Date = g.Date,
-                })
                 .ToListAsync();
-            return result;
+
+            var dailyMoods = emotions
+                .GroupBy(e => e.Date.Date)
+                .Select(g => g.OrderByDescending(e => e.Date).FirstOrDefault())
+                .Where(e => e != null && e.Mood_selection != null)
+                .Select(e => new MoodDTO
+                {
+                    Mood_Name = e.Mood_selection.Mood,
+                    Date = e.Date
+                })
+                .ToList();
+
+            return dailyMoods;
         }
 
         public async Task DeleteEmotion(Guid id)
