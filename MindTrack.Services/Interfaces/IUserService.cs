@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static MindTrack.Services.UserService;
 
 namespace MindTrack.Services.Interfaces
 {
@@ -14,13 +15,14 @@ namespace MindTrack.Services.Interfaces
         Task<IEnumerable<UserDTO>> GetAllUsers();
         Task<UserDTO> GetUserByUsername(string username);
         Task<UserDTO> GetUserById(Guid id);
-        Task<User> CreateUser(UserRegisterDTO request);
+        Task<RegisterResult> CreateUser(UserRegisterDTO request);
         Task<string> Login(LoginDTO request);
         Task DeleteUser(Guid id);
         Task<bool> ForgotPasswordWithCodeAsync(string email);
         Task<bool> ResetPasswordWithCodeAsync(string email, string code, string newPassword);
         Task<bool> ConfirmAccount(string email);
         Task<bool> AccountConfirmationWithCode(string email, string code);
+
 
     }
 }

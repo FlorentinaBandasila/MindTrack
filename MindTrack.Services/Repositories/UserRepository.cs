@@ -41,6 +41,13 @@ namespace MindTrack.Services.Repositories
             await _mindTrackContext.SaveChangesAsync();
         }
 
+        public async Task<User?> GetUserByUsernameOrEmail(string username, string email)
+        {
+            return await _mindTrackContext.Users
+                .FirstOrDefaultAsync(u => u.Username == username || u.Email == email);
+        }
+
+
         public async Task DeleteUser(Guid id)
         {
             var user = await _mindTrackContext.Users.FindAsync(id);

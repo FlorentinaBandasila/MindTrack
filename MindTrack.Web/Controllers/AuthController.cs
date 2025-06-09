@@ -12,13 +12,18 @@ namespace MindTrack.Web.Controllers
         public static User user = new();
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(UserRegisterDTO request)
+        public async Task<ActionResult> Register(UserRegisterDTO request)
         {
-            var user = await userService.CreateUser(request);
-            if (user is null) return BadRequest("User allready exists");
+            var result = await userService.CreateUser(request);
 
-            return Ok(user);
+            if (!result.Success)
+            {
+                return BadRequest(new { message = result.ErrorMessage });
+            }
+
+            return Ok(result.User);
         }
+
 
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(LoginDTO request)

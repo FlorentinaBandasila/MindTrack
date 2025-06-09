@@ -56,9 +56,25 @@ namespace MindTrack.Services
             return _mapper.Map<UserDTO>(user);
         }
 
-        public async Task<User> CreateUser(UserRegisterDTO request)
+
+
+
+        public async Task<RegisterResult> CreateUser(UserRegisterDTO request)
         {
-            var user = new User {
+            var existingUser = await _userRepository
+                .GetUserByUsernameOrEmail(request.Username, request.Email);
+
+            if (existingUser != null)
+            {
+                return new RegisterResult
+                {
+                    Success = false,
+                    ErrorMessage = "Username sau email deja folosit."
+                };
+            }
+
+            var user = new User
+            {
                 User_id = Guid.NewGuid(),
                 Username = request.Username,
                 Email = request.Email,
@@ -70,14 +86,19 @@ namespace MindTrack.Services
             };
 
             var hashedPassword = new PasswordHasher<User>()
-                 .HashPassword(user, request.Password);
+                .HashPassword(user, request.Password);
 
-            user.Username = request.Username;
             user.Password = hashedPassword;
-            
+
             await _userRepository.CreateUser(user);
-            return user;
+
+            return new RegisterResult
+            {
+                Success = true,
+                User = user
+            };
         }
+
 
         public async Task<string?> Login(LoginDTO request)
         {
@@ -204,6 +225,12 @@ namespace MindTrack.Services
             await _userRepository.DeleteUser(id);
         }
 
-        
+        public class RegisterResult
+        {
+            public bool Success { get; set; }
+            public string? ErrorMessage { get; set; }
+            public User? User { get; set; }
+        }
+
     }
 }
