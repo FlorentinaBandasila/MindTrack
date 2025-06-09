@@ -90,7 +90,17 @@ namespace MindTrack.Web.Controllers
             return Ok("Password reset code sent to email.");
         }
 
-        
+        [HttpPost("account-confirmation")]
+        public async Task<IActionResult> AccountConfirmation([FromBody] string email)
+        {
+            var result = await _userService.ConfirmAccount(email);
+            if (!result)
+                return NotFound("User with this email does not exist.");
+
+            return Ok("Account confirmation code sent to email.");
+        }
+
+
         public class ResetPasswordCodeDTO
         {
             public string Email { get; set; } = string.Empty;
@@ -107,6 +117,16 @@ namespace MindTrack.Web.Controllers
                 return BadRequest("Invalid or expired reset code.");
 
             return Ok("Password has been reset successfully.");
+        }
+
+        [HttpPost("account-activation-code")]
+        public async Task<IActionResult> AccountConfirmationWithCode([FromBody] ResetPasswordCodeDTO model)
+        {
+            var result = await _userService.AccountConfirmationWithCode(model.Email, model.Code);
+            if (!result)
+                return BadRequest("Invalid or expired reset code.");
+
+            return Ok("Account is activated.");
         }
     }
 }

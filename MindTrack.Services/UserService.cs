@@ -93,31 +93,6 @@ namespace MindTrack.Services
             return CreateToken(user);
         }
 
-        public async Task<bool> ForgotPasswordAsync(string email)
-        {
-            var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return false;
-
-
-            var token = CreateToken(user, expiresInMinutes: 15);
-
-            var resetLink = $"https://localhost:60126/api/User/reset-password?token={token}";
-            var subject = "Reset Your Password";
-            var body = $@"
-    <html>
-        <body>
-            <p>Click the link below to reset your password:</p>
-            <p><a href=""{resetLink}"" target=""_blank"">{resetLink}</a></p>
-        </body>
-    </html>";
-
-
-            var emailSender = new EmailSender(_configuration);
-            await emailSender.SendEmailAsync(email, subject, body);
-
-            return true;
-        }
-
         public async Task<bool> ForgotPasswordWithCodeAsync(string email)
         {
             var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.Email == email);
@@ -141,6 +116,43 @@ namespace MindTrack.Services
             return true;
         }
 
+        public async Task<bool> ConfirmAccount(string email)
+        {
+            var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return false;
+
+            var code = new Random().Next(100000, 999999).ToString();
+
+
+            _cache.Set($"pwd-reset:{email}", code, TimeSpan.FromMinutes(10));
+
+            var body = $@"
+        <html>
+            <body>
+                <p>Your account confirmation code is: <strong>{code}</strong></p>
+            </body>
+        </html>";
+
+            var emailSender = new EmailSender(_configuration);
+            await emailSender.SendEmailAsync(email, "Account Confirmation Code", body);
+
+            return true;
+        }
+
+        public async Task<bool> AccountConfirmationWithCode(string email, string code)
+        {
+            if (!_cache.TryGetValue($"pwd-reset:{email}", out string? cachedCode))
+                return false;
+
+            if (cachedCode != code)
+                return false;
+
+           
+            _cache.Remove($"pwd-reset:{email}");
+
+            return true;
+        }
+
         public async Task<bool> ResetPasswordWithCodeAsync(string email, string code, string newPassword)
         {
             if (!_cache.TryGetValue($"pwd-reset:{email}", out string? cachedCode))
@@ -158,7 +170,7 @@ namespace MindTrack.Services
 
             await _mindTrackContext.SaveChangesAsync();
 
-           
+
             _cache.Remove($"pwd-reset:{email}");
 
             return true;

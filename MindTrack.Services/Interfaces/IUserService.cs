@@ -19,6 +19,8 @@ namespace MindTrack.Services.Interfaces
         Task DeleteUser(Guid id);
         Task<bool> ForgotPasswordWithCodeAsync(string email);
         Task<bool> ResetPasswordWithCodeAsync(string email, string code, string newPassword);
+        Task<bool> ConfirmAccount(string email);
+        Task<bool> AccountConfirmationWithCode(string email, string code);
 
     }
 }

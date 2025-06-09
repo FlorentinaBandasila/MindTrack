@@ -37,7 +37,7 @@ namespace MindTrack.Services
 
             var mailMessage = new MailMessage
             {
-                From = new MailAddress(emailConfig["From"]),
+                From = new MailAddress(emailConfig["From"], "MindTrack"),
                 Subject = subject,
                 Body = body,
                 IsBodyHtml = true
