@@ -11,7 +11,7 @@ using MindTrack.Models.Data;
 
 namespace MindTrack.Web.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UserController : ControllerBase
@@ -78,6 +78,35 @@ namespace MindTrack.Web.Controllers
             await _mindTrackContext.SaveChangesAsync();
 
             return Ok(new { avatar = user.Avatar });
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] string email)
+        {
+            var result = await _userService.ForgotPasswordWithCodeAsync(email);
+            if (!result)
+                return NotFound("User with this email does not exist.");
+
+            return Ok("Password reset code sent to email.");
+        }
+
+        
+        public class ResetPasswordCodeDTO
+        {
+            public string Email { get; set; } = string.Empty;
+            public string Code { get; set; } = string.Empty;
+            public string NewPassword { get; set; } = string.Empty;
+        }
+
+       
+        [HttpPost("reset-password-code")]
+        public async Task<IActionResult> ResetPasswordWithCode([FromBody] ResetPasswordCodeDTO model)
+        {
+            var result = await _userService.ResetPasswordWithCodeAsync(model.Email, model.Code, model.NewPassword);
+            if (!result)
+                return BadRequest("Invalid or expired reset code.");
+
+            return Ok("Password has been reset successfully.");
         }
     }
 }

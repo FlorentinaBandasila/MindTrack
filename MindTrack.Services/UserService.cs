@@ -15,6 +15,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using MindTrack.Models.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MindTrack.Services
 {
@@ -24,14 +25,17 @@ namespace MindTrack.Services
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly MindTrackContext _mindTrackContext;
+        private readonly IMemoryCache _cache;
+        private readonly PasswordHasher<string> _passwordHasher = new();
 
         public UserService(IUserRepository userRepository, IMapper mapper, IConfiguration configuration, MindTrackContext
-            mindTrackContext)
+            mindTrackContext, IMemoryCache cache)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _configuration = configuration;
             _mindTrackContext = mindTrackContext;
+            _cache = cache;
         }
 
         public async Task<IEnumerable<UserDTO>> GetAllUsers()
@@ -89,28 +93,98 @@ namespace MindTrack.Services
             return CreateToken(user);
         }
 
+        public async Task<bool> ForgotPasswordAsync(string email)
+        {
+            var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return false;
 
-        private string CreateToken(User user)
+
+            var token = CreateToken(user, expiresInMinutes: 15);
+
+            var resetLink = $"https://localhost:60126/api/User/reset-password?token={token}";
+            var subject = "Reset Your Password";
+            var body = $@"
+    <html>
+        <body>
+            <p>Click the link below to reset your password:</p>
+            <p><a href=""{resetLink}"" target=""_blank"">{resetLink}</a></p>
+        </body>
+    </html>";
+
+
+            var emailSender = new EmailSender(_configuration);
+            await emailSender.SendEmailAsync(email, subject, body);
+
+            return true;
+        }
+
+        public async Task<bool> ForgotPasswordWithCodeAsync(string email)
+        {
+            var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return false;
+
+            var code = new Random().Next(100000, 999999).ToString();
+
+           
+            _cache.Set($"pwd-reset:{email}", code, TimeSpan.FromMinutes(10));
+
+            var body = $@"
+        <html>
+            <body>
+                <p>Your password reset code is: <strong>{code}</strong></p>
+            </body>
+        </html>";
+
+            var emailSender = new EmailSender(_configuration);
+            await emailSender.SendEmailAsync(email, "Your Reset Code", body);
+
+            return true;
+        }
+
+        public async Task<bool> ResetPasswordWithCodeAsync(string email, string code, string newPassword)
+        {
+            if (!_cache.TryGetValue($"pwd-reset:{email}", out string? cachedCode))
+                return false;
+
+            if (cachedCode != code)
+                return false;
+
+            var user = await _mindTrackContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null) return false;
+
+            string hashedPassword = _passwordHasher.HashPassword(null, newPassword);
+
+            user.Password = hashedPassword;
+
+            await _mindTrackContext.SaveChangesAsync();
+
+           
+            _cache.Remove($"pwd-reset:{email}");
+
+            return true;
+        }
+
+
+        private string CreateToken(User user, int expiresInMinutes = 60 * 24)
         {
             var claims = new List<Claim>
-             {
-                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.User_id.ToString())
-             };
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.User_id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim("Email", user.Email)
+            };
 
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token")!));
-
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["AppSettings:Token"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
-            var tokenDescriptor = new JwtSecurityToken(
-                issuer: _configuration.GetValue<string>("AppSettings:Issuer"),
-                audience: _configuration.GetValue<string>("AppSettings:Audience"),
-                claims: claims,
-                expires: DateTime.Now.AddDays(1),
-                signingCredentials: creds
-            );
 
-            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+            var token = new JwtSecurityToken(
+                issuer: _configuration["AppSettings:Issuer"],
+                audience: _configuration["AppSettings:Audience"],
+                claims: claims,
+                expires: DateTime.Now.AddMinutes(expiresInMinutes),
+                signingCredentials: creds);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
         public async Task DeleteUser(Guid id)

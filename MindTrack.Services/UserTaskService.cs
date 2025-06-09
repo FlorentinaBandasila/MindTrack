@@ -79,6 +79,7 @@ namespace MindTrack.Services
         {
             var userTasks = await _context.UserTasks
                 .Where(u => u.User_id == userId)
+                .OrderByDescending(d=>d.Created_date)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<UserTaskDTO>>(userTasks);

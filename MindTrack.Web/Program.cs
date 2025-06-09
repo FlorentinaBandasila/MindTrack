@@ -100,6 +100,7 @@ builder.Services.AddScoped<IQuizResultsService, QuizResultsService>();
 builder.Services.AddScoped<IQuizResultsRepository, QuizResultsRepository>();
 builder.Services.AddScoped<IRecommendedTaskRepository, RecommendedTaskRepository>();
 builder.Services.AddScoped<IRecommendedTaskService, RecommendedTaskService>();
+builder.Services.AddTransient<EmailSender>();
 
 builder.Services.AddCors(options =>
 {
@@ -115,7 +116,7 @@ builder.Services.AddCors(options =>
 //    options.ListenAnyIP(7035, o => o.UseHttps()); // https � same as launchSettings
 //});
 
-
+builder.Services.AddMemoryCache();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

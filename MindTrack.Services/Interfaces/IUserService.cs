@@ -17,6 +17,8 @@ namespace MindTrack.Services.Interfaces
         Task<User> CreateUser(UserRegisterDTO request);
         Task<string> Login(LoginDTO request);
         Task DeleteUser(Guid id);
-        
+        Task<bool> ForgotPasswordWithCodeAsync(string email);
+        Task<bool> ResetPasswordWithCodeAsync(string email, string code, string newPassword);
+
     }
 }
