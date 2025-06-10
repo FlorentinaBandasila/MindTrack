@@ -110,14 +110,15 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
-//builder.WebHost.ConfigureKestrel(options =>
-//{
-//    options.ListenAnyIP(5000);                 // http
-//    options.ListenAnyIP(7035, o => o.UseHttps()); // https � same as launchSettings
-//});
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5000);                 // http
+    options.ListenAnyIP(7035, o => o.UseHttps()); // https � same as launchSettings
+});
 
 builder.Services.AddMemoryCache();
 var app = builder.Build();
+app.Urls.Add("http://0.0.0.0:5000");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -137,7 +138,7 @@ if (app.Environment.IsDevelopment())
 // In Configure() method:
 app.UseCors("AllowAll");
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();

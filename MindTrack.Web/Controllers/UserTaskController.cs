@@ -114,7 +114,7 @@ namespace MindTrack.Web.Controllers
                 .Count(t => t.Status == "done");
 
             var totalTasks = relevantTasks.Count;
-            var percentage = totalTasks == 0 ? 100 : (completedTasks * 100) / totalTasks;
+            var percentage = totalTasks == 0 ? 0 : (completedTasks * 100) / totalTasks;
 
             var result = new WeeklyProgressDTO
             {

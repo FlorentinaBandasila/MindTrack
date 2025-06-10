@@ -69,7 +69,7 @@ namespace MindTrack.Services
                 return new RegisterResult
                 {
                     Success = false,
-                    ErrorMessage = "Username sau email deja folosit."
+                    ErrorMessage = "Username/Email already used"
                 };
             }
 

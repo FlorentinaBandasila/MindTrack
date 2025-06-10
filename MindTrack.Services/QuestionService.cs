@@ -47,9 +47,10 @@ namespace MindTrack.Services
         {
             var categoryOrder = new List<string>
             {
+                "Positive",
                 "Anxiety",
                 "Depression",
-                "Positive",
+                
             };
 
             var questions = await _questionRepository.GetAllQuestionsWithAnswers();

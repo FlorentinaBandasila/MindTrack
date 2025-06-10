@@ -20,7 +20,8 @@ namespace MindTrack.Services
         private readonly IQuizResultsService _quizResultsService;
         private readonly MindTrackContext _context;
 
-        public RecommendedTaskService(IRecommendedTaskRepository recommendedTaskRepository, IMapper mapper, IQuizResultsService quizResultsService, MindTrackContext context)
+        public RecommendedTaskService(IRecommendedTaskRepository recommendedTaskRepository, IMapper mapper,
+            IQuizResultsService quizResultsService, MindTrackContext context)
         {
             _recommendedTaskRepository = recommendedTaskRepository;
             _mapper = mapper;
@@ -45,62 +46,71 @@ namespace MindTrack.Services
 
             return _mapper.Map<IEnumerable<RecommendedTask>>(filteredTasks);
         }
+
+        private static readonly SemaphoreSlim _semaphore = new(1, 1);
+
         public async Task AssignDailyRecommendedTasks(Guid userId)
         {
-            var today = DateTime.Today;
-
-            bool hasTodayTask = await _context.UserTasks
-                .AnyAsync(ut => ut.User_id == userId
-                                && ut.Recommended_Task_Id != null
-                                && ut.Created_date.Date == today);
-
-            if (hasTodayTask)
+            await _semaphore.WaitAsync();
+            try
             {
-                Console.WriteLine("User already has a recommended task for today.");
-                return;
+                var today = DateTime.Today;
+
+                bool hasTodayTask = await _context.UserTasks
+                    .AnyAsync(ut => ut.User_id == userId
+                                    && ut.Recommended_Task_Id != null
+                                    && ut.Created_date.Date == today);
+
+                if (hasTodayTask) return;
+
+
+                var quizResultDto = await _quizResultsService.GetQuizResultsByUser(userId);
+                if (quizResultDto == null || string.IsNullOrEmpty(quizResultDto.Title))
+                    return;
+
+                var mood = quizResultDto.Title;
+
+                var alreadyUsedTaskIds = await _context.UserTasks
+                    .Where(ut => ut.User_id == userId && ut.Recommended_Task_Id != null)
+                    .Select(ut => ut.Recommended_Task_Id.Value)
+                    .ToListAsync() ?? new List<Guid>();
+
+                var newRecommendedTasks = await _context.RecommendedTasks
+                    .Where(rt => rt.Mood == mood && !alreadyUsedTaskIds.Contains(rt.Recommended_Task_Id))
+                    .OrderBy(r => Guid.NewGuid())
+                    .Take(1)
+                    .ToListAsync();
+
+                if (!newRecommendedTasks.Any())
+                    return;
+
+                var defaultCategoryId = await _context.TaskCategories
+                    .Select(c => c.Category_id)
+                    .FirstOrDefaultAsync();
+
+                var newUserTasks = newRecommendedTasks.Select(rt => new UserTask
+                {
+                    Task_id = Guid.NewGuid(),
+                    User_id = userId,
+                    Category_id = defaultCategoryId,
+                    Title = rt.Title,
+                    Priority = rt.Priority,
+                    Details = rt.Details,
+                    Created_date = today,
+                    End_date = today,
+                    Status = "todo",
+                    Recommended_Task_Id = rt.Recommended_Task_Id
+                });
+
+                _context.UserTasks.AddRange(newUserTasks);
+                await _context.SaveChangesAsync();
+
+            }
+            finally
+            {
+                _semaphore.Release();
             }
 
-            var quizResultDto = await _quizResultsService.GetQuizResultsByUser(userId);
-            if (quizResultDto == null || string.IsNullOrEmpty(quizResultDto.Title))
-                return;
-
-            var mood = quizResultDto.Title;
-
-            var alreadyUsedTaskIds = await _context.UserTasks
-                .Where(ut => ut.User_id == userId && ut.Recommended_Task_Id != null)
-                .Select(ut => ut.Recommended_Task_Id.Value)
-                .ToListAsync() ?? new List<Guid>();
-
-            var newRecommendedTasks = await _context.RecommendedTasks
-                .Where(rt => rt.Mood == mood && !alreadyUsedTaskIds.Contains(rt.Recommended_Task_Id))
-                .OrderBy(r => Guid.NewGuid()) 
-                .Take(1)
-                .ToListAsync();
-
-            if (!newRecommendedTasks.Any())
-                return;
-
-            var defaultCategoryId = await _context.TaskCategories
-                .Select(c => c.Category_id)
-                .FirstOrDefaultAsync();
-
-            var newUserTasks = newRecommendedTasks.Select(rt => new UserTask
-            {
-                Task_id = Guid.NewGuid(),
-                User_id = userId,
-                Category_id = defaultCategoryId,
-                Title = rt.Title,
-                Priority = rt.Priority,
-                Details = rt.Details,
-                Created_date = today,
-                End_date = today,
-                Status = "todo",
-                Recommended_Task_Id = rt.Recommended_Task_Id
-            });
-
-            _context.UserTasks.AddRange(newUserTasks);
-            await _context.SaveChangesAsync();
         }
-
     }
 }
