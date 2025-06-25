@@ -2,12 +2,13 @@
 using MindTrack.Models.DTOs;
 using MindTrack.Models;
 using MindTrack.Services.Interfaces;
+using MindTrack.Services.Repositories;
 
 namespace MindTrack.Web.Controllers
 {
     [Route("api/")]
     [ApiController]
-    public class AuthController(IUserService userService) : ControllerBase
+    public class AuthController(IUserService userService, IUserRepository userRepository) : ControllerBase
     {
         public static User user = new();
 
@@ -22,6 +23,30 @@ namespace MindTrack.Web.Controllers
             }
 
             return Ok(result.User);
+        }
+
+        [HttpPost("register/google")]
+        public async Task<ActionResult<object>> RegisterGoogle(UserRegisterDTO request)
+        {
+            var existingUser = await userRepository.GetUserByEmail(request.Email);
+
+            User user;
+
+            if (existingUser != null)
+            {
+                user = existingUser;
+            }
+            else
+            {
+                var createResult = await userService.CreateUser(request);
+                if (!createResult.Success)
+                    return BadRequest(createResult.ErrorMessage);
+
+                user = createResult.User;
+            }
+
+            var token = userService.LoginWithGoogle(user);
+            return Ok(new { token, user });
         }
 
 

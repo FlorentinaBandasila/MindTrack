@@ -118,10 +118,10 @@ namespace MindTrack.Services
         private string GetTitleByScore(int vpi, int ri)
         {
             if (vpi <= 9 && ri >= 30)
-                return "Mental health thriving – resilient and stable";
+                return "Mental health thriving, resilient and stable";
 
             if (vpi <= 9 && ri < 30)
-                return "Stable but low positivity – monitor well-being";
+                return "Stable but low positivity, monitor well-being";
 
             if (vpi <= 19 && ri >= 30)
                 return "Mild symptoms but emotionally resilient";
@@ -136,13 +136,13 @@ namespace MindTrack.Services
                 return "Moderate distress with low resilience";
 
             if (vpi <= 39 && ri >= 30)
-                return "Severe symptoms but retains emotional strength";
+                return "Severe symptoms, retains emotional strength";
 
             if (vpi <= 39 && ri < 30)
-                return "Severe mental health strain – low resilience";
+                return "Severe mental health strain, low resilience";
 
             if (vpi <= 48)
-                return "Critical distress – immediate support needed";
+                return "Critical distress, immediate support needed";
 
             return "Uncategorized Profile";
         }

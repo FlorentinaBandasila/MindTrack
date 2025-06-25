@@ -16,6 +16,6 @@ namespace MindTrack.Services.Interfaces
         Task DeleteUser(Guid id);
         Task<User?> GetUserByUsernameOrEmail(string username, string email);
 
-
+        Task<User?> GetUserByEmail(string email);
     }
 }

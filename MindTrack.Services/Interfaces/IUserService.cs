@@ -18,10 +18,11 @@ namespace MindTrack.Services.Interfaces
         Task<RegisterResult> CreateUser(UserRegisterDTO request);
         Task<string> Login(LoginDTO request);
         Task DeleteUser(Guid id);
-        Task<bool> ForgotPasswordWithCodeAsync(string email);
-        Task<bool> ResetPasswordWithCodeAsync(string email, string code, string newPassword);
+        Task<bool> ForgotPasswordWithCode(string email);
+        Task<bool> ResetPasswordWithCode(string email, string code, string newPassword);
         Task<bool> ConfirmAccount(string email);
         Task<bool> AccountConfirmationWithCode(string email, string code);
+        public string LoginWithGoogle(User user);
 
 
     }

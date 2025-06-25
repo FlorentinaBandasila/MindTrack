@@ -25,7 +25,7 @@ namespace MindTrack.Services.Repositories
 
         public async Task<QuizResults?> GetQuizResultsByUser(Guid id)
         {
-            var result = await _mindTrackContext.QuizResults.FirstOrDefaultAsync(q => q.User_id == id);
+            var result = await _mindTrackContext.QuizResults.OrderByDescending(q => q.Date).FirstOrDefaultAsync(q => q.User_id == id);
             return result;
         }
 

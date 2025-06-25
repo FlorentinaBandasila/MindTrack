@@ -12,5 +12,6 @@ namespace MindTrack.Models.DTOs
    public class QuizResultsDTO
     {
         public string Title { get; set; }
+        public DateTime Date { get; set; }
     }
 }

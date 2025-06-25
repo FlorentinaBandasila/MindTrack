@@ -27,6 +27,7 @@ namespace MindTrack.Services
             return new QuizResultsDTO
             {
                 Title = quizresults.Title,
+                Date = quizresults.Date,
             };
 
         }

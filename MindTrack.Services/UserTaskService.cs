@@ -50,7 +50,6 @@ namespace MindTrack.Services
         public async Task CreateUserTask(UserTaskDTO userTaskDTO)
         {
             var user = await _userRepository.GetUserById(userTaskDTO.User_id);
-            //var task = await _taskCategory.GetTaskCategoryById(userTaskDTO.Category_id);
             var task = new Guid("854E0CA3-0D26-4E6D-B1A2-096020887FD1");
             var userTaskModel = new UserTask
             {

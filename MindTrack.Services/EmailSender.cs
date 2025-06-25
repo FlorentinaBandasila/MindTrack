@@ -18,7 +18,7 @@ namespace MindTrack.Services
             _configuration = configuration;
         }
 
-        public async Task SendEmailAsync(string toEmail, string subject, string body)
+        public async Task SendEmail(string toEmail, string subject, string body)
         {
             var emailConfig = _configuration.GetSection("EmailConfiguration");
 

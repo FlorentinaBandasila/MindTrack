@@ -83,7 +83,7 @@ namespace MindTrack.Web.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] string email)
         {
-            var result = await _userService.ForgotPasswordWithCodeAsync(email);
+            var result = await _userService.ForgotPasswordWithCode(email);
             if (!result)
                 return NotFound("User with this email does not exist.");
 
@@ -112,7 +112,7 @@ namespace MindTrack.Web.Controllers
         [HttpPost("reset-password-code")]
         public async Task<IActionResult> ResetPasswordWithCode([FromBody] ResetPasswordCodeDTO model)
         {
-            var result = await _userService.ResetPasswordWithCodeAsync(model.Email, model.Code, model.NewPassword);
+            var result = await _userService.ResetPasswordWithCode(model.Email, model.Code, model.NewPassword);
             if (!result)
                 return BadRequest("Invalid or expired reset code.");
 
