@@ -23,6 +23,7 @@ namespace MindTrack.Services.Interfaces
         Task<bool> ConfirmAccount(string email);
         Task<bool> AccountConfirmationWithCode(string email, string code);
         public string LoginWithGoogle(User user);
+        public string CreateToken(User user, int expiresInMinutes = 60 * 24);
 
 
     }

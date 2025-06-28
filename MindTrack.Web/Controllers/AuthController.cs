@@ -3,12 +3,15 @@ using MindTrack.Models.DTOs;
 using MindTrack.Models;
 using MindTrack.Services.Interfaces;
 using MindTrack.Services.Repositories;
+using Google.Apis.Auth;
+using MindTrack.Services;
+using Newtonsoft.Json;
 
 namespace MindTrack.Web.Controllers
 {
     [Route("api/")]
     [ApiController]
-    public class AuthController(IUserService userService, IUserRepository userRepository) : ControllerBase
+    public class AuthController(IUserService userService, IUserRepository userRepository, IConfiguration configuration, IUserRepository userRepo) : ControllerBase
     {
         public static User user = new();
 
@@ -58,5 +61,50 @@ namespace MindTrack.Web.Controllers
 
             return Ok(token);
         }
+        // DTO
+        public class GoogleTokenDTO
+        {
+            public string AccessToken { get; set; } = null!;
+        }
+
+        // Controller
+        [HttpPost("login/google")]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] GoogleTokenDTO dto)
+        {
+            // 1) call Google to get user info
+            using var http = new HttpClient();
+            var resp = await http.GetAsync(
+              $"https://www.googleapis.com/oauth2/v3/userinfo?access_token={dto.AccessToken}");
+            if (!resp.IsSuccessStatusCode)
+                return BadRequest("Invalid Google access token");
+
+            var json = await resp.Content.ReadAsStringAsync();
+            dynamic info = JsonConvert.DeserializeObject(json)!;
+            string email = info.email;
+
+            // 2) lookup or create by email
+            var user = await userRepo.GetUserByEmail(email);
+            if (user == null)
+            {
+                var registerDto = new UserRegisterDTO
+                {
+                    Username = email.Split('@')[0],
+                    Email = email,
+                    Full_name = info.name,
+                    Phone = "",
+                    Password = Guid.NewGuid().ToString()
+                };
+                var result = await userService.CreateUser(registerDto);
+                if (!result.Success)
+                    return BadRequest(result.ErrorMessage);
+                user = result.User!;
+            }
+
+            // 3) issue your JWT
+            var token = userService.LoginWithGoogle(user);
+            return Ok(new { token });
+        }
+
+
     }
 }

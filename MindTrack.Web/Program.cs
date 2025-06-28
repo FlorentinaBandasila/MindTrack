@@ -110,15 +110,11 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader());
 });
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(5000);                 // http
-    options.ListenAnyIP(7035, o => o.UseHttps()); // https � same as launchSettings
-});
+
 
 builder.Services.AddMemoryCache();
+builder.WebHost.UseUrls("http://0.0.0.0:5175");
 var app = builder.Build();
-app.Urls.Add("http://0.0.0.0:5000");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

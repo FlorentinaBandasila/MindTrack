@@ -204,7 +204,7 @@ namespace MindTrack.Services
         }
 
 
-        private string CreateToken(User user, int expiresInMinutes = 60 * 24)
+        public string CreateToken(User user, int expiresInMinutes = 60 * 24)
         {
             var claims = new List<Claim>
             {
